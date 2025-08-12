@@ -120,85 +120,108 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   }
 
   Widget _buildReportCard(FactoryReportModel report) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, 10))
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header: Item Name
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(Icons.factory, size: 48, color: Colors.blue),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Text(
-                  report.itemName ?? 'Item',
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ],
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30),
+          gradient: LinearGradient(
+            colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          const SizedBox(height: 40),
-
-          // Metric Rows
-          Center(
+          boxShadow: [
+          //  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
+          ],
+        ),
+        child: Card(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildMetricRow(Icons.view_module, "Total Lines", report.totalLine.toString()),
-                _buildMetricRow(Icons.speed, "Average Efficiency", "${report.averageEfficiency}%"),
-                _buildMetricRow(Icons.inventory, "Quantity", report.quantity.toString()),
-                _buildMetricRow(Icons.date_range, "Production Date", report.productionDate.toString()),
+                // Title
+                Row(
+                  children: [
+                    const Icon(Icons.factory, size: 56, color: Colors.blueAccent),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Text(
+                            report.itemName ?? "Item Name",
+                            style: const TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Spacer(),
+                          Image.asset('assets/icon/icon.png',height: 80,width: 80,)
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+
+                // Metrics Section
+                GridView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisExtent: 132,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                  ),
+                  children: [
+                    _buildMetricBox(Icons.view_module, "Total Lines", report.totalLine.toString()),
+                    _buildMetricBox(Icons.speed, "Avg. Efficiency", "${report.averageEfficiency}%"),
+                    _buildMetricBox(Icons.inventory, "Quantity", report.quantity.toString()),
+                    _buildMetricBox(Icons.date_range, "Prod. Date", report.productionDate ?? ""),
+                  ],
+                ),
               ],
             ),
-          )
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMetricBox(IconData icon, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))
+        ],
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 32, color: Colors.blueGrey),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 20, color: Colors.black87)),
+                Text(value, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildMetricRow(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 32, color: Colors.grey),
-          const SizedBox(width: 30),
-          Text(
-            '$label : ',
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
 
 
@@ -272,22 +295,40 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(width: 12,),
-                      IconButton(
-                        onPressed: _goToPreviousPage,
-                        icon: const Icon(Icons.arrow_back,size: 24,),
-                        tooltip: 'Previous',
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey.shade200,
+                        ),
+                        child: IconButton(
+                          onPressed: _goToPreviousPage,
+                          icon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: const Icon(Icons.arrow_back,size: 24,color: Colors.black,),
+                          ),
+                          tooltip: 'Previous',
+                        ),
                       ),
                       Expanded(
                         child: IconButton(
                           onPressed: _togglePause,
-                          icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause,size: 48,),
+                          icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause,size: 48,color: Colors.grey,),
                           tooltip: _isPaused ? 'Resume' : 'Pause',
                         ),
                       ),
-                      IconButton(
-                        onPressed: _goToNextPage,
-                        icon: const Icon(Icons.arrow_forward,size: 24,),
-                        tooltip: 'Next',
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey.shade200,
+                        ),
+                        child: IconButton(
+                          onPressed: _goToNextPage,
+                          icon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: const Icon(Icons.arrow_forward,size: 24,),
+                          ),
+                          tooltip: 'Next',
+                        ),
                       ),
                       SizedBox(width: 12,),
                     ],
