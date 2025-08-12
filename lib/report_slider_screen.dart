@@ -20,23 +20,34 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   Timer? _timer;
   bool _isPaused = false;
   final FocusNode _mainFocusNode = FocusNode();
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _startAutoScroll();
+    _startAutoRefresh();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_mainFocusNode);
     });
   }
+  void _startAutoRefresh() {
+    _refreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
+      ref.invalidate(reportListProvider); // Forces re-fetch from API
+      HelperClass.showMessage(message: 'Data refreshed', size: 20);
+    });
+  }
+
 
   @override
   void dispose() {
     _timer?.cancel();
+    _refreshTimer?.cancel(); // 🔁 Cancel refresh timer
     _pageController.dispose();
     _mainFocusNode.dispose();
     super.dispose();
   }
+
 
   void _startAutoScroll() {
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
@@ -100,7 +111,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     }
   }
 
-  List<FactoryReport> _getReports() {
+  List<FactoryReportModel> _getReports() {
     final asyncValue = ref.watch(reportListProvider);
     return asyncValue.maybeWhen(
       data: (data) => data,
@@ -108,81 +119,88 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     );
   }
 
-  Widget _buildReportCard(FactoryReport report) {
+  Widget _buildReportCard(FactoryReportModel report) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+      margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 40),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(30),
         color: Colors.white,
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))
+          BoxShadow(color: Colors.black26, blurRadius: 20, offset: Offset(0, 10))
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: report.color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(report.icon),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            report.title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            report.value,
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 12),
+          // Header: Item Name
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                report.change.startsWith('+')
-                    ? Icons.arrow_upward
-                    : report.change.startsWith('-')
-                    ? Icons.arrow_downward
-                    : Icons.remove,
-                color: report.change.startsWith('+')
-                    ? Colors.green
-                    : report.change.startsWith('-')
-                    ? Colors.red
-                    : Colors.grey,
-                size: 24,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                report.change,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: report.change.startsWith('+')
-                      ? Colors.green
-                      : report.change.startsWith('-')
-                      ? Colors.red
-                      : Colors.grey,
+              const Icon(Icons.factory, size: 48, color: Colors.blue),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Text(
+                  report.itemName ?? 'Item',
+                  style: const TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 40),
+
+          // Metric Rows
+          Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildMetricRow(Icons.view_module, "Total Lines", report.totalLine.toString()),
+                _buildMetricRow(Icons.speed, "Average Efficiency", "${report.averageEfficiency}%"),
+                _buildMetricRow(Icons.inventory, "Quantity", report.quantity.toString()),
+                _buildMetricRow(Icons.date_range, "Production Date", report.productionDate.toString()),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 32, color: Colors.grey),
+          const SizedBox(width: 30),
+          Text(
+            '$label : ',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
         ],
       ),
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +221,20 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
               }
 
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      onPressed: () {
+                        ref.invalidate(reportListProvider);
+                        HelperClass.showMessage(message: 'Manually refreshed', size: 20);
+                      },
+                      icon: const Icon(Icons.refresh, size: 24),
+                      tooltip: 'Refresh',
+                    ),
+                  ),
+
                   Expanded(
                     child: PageView.builder(
                       controller: _pageController,

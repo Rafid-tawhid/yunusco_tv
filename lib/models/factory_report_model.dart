@@ -1,36 +1,54 @@
-// model/factory_report.dart
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+class FactoryReportModel {
+  FactoryReportModel({
+      String? productionDate, 
+      String? itemName, 
+      num? totalLine, 
+      num? quantity, 
+      num? averageEfficiency,}){
+    _productionDate = productionDate;
+    _itemName = itemName;
+    _totalLine = totalLine;
+    _quantity = quantity;
+    _averageEfficiency = averageEfficiency;
+}
 
-class FactoryReport {
-  final String title;
-  final String value;
-  final String change;
-  final IconData icon;
+  FactoryReportModel.fromJson(dynamic json) {
+    _productionDate = json['ProductionDate'];
+    _itemName = json['ItemName'];
+    _totalLine = json['TotalLine'];
+    _quantity = json['Quantity'];
+    _averageEfficiency = json['AverageEfficiency'];
+  }
+  String? _productionDate;
+  String? _itemName;
+  num? _totalLine;
+  num? _quantity;
+  num? _averageEfficiency;
+FactoryReportModel copyWith({  String? productionDate,
+  String? itemName,
+  num? totalLine,
+  num? quantity,
+  num? averageEfficiency,
+}) => FactoryReportModel(  productionDate: productionDate ?? _productionDate,
+  itemName: itemName ?? _itemName,
+  totalLine: totalLine ?? _totalLine,
+  quantity: quantity ?? _quantity,
+  averageEfficiency: averageEfficiency ?? _averageEfficiency,
+);
+  String? get productionDate => _productionDate;
+  String? get itemName => _itemName;
+  num? get totalLine => _totalLine;
+  num? get quantity => _quantity;
+  num? get averageEfficiency => _averageEfficiency;
 
-  final Color color;
-
-  FactoryReport({
-    required this.title,
-    required this.value,
-    required this.change,
-    required this.color,
-    required this.icon,
-  });
-
-  factory FactoryReport.fromJson(Map<String, dynamic> json) {
-    return FactoryReport(
-      title: json['title'],
-      value: json['value'],
-      change: json['change'],
-      icon: json['icon'],
-      color: _getColorFromHex(json['color']),
-    );
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{};
+    map['ProductionDate'] = _productionDate;
+    map['ItemName'] = _itemName;
+    map['TotalLine'] = _totalLine;
+    map['Quantity'] = _quantity;
+    map['AverageEfficiency'] = _averageEfficiency;
+    return map;
   }
 
-
-
-  static Color _getColorFromHex(String hex) {
-    return Color(int.parse(hex.replaceFirst('#', '0xff')));
-  }
 }

@@ -12,6 +12,6 @@ final reportRepositoryProvider = Provider((ref) {
   return ReportRepository(ref.read(reportServiceProvider));
 });
 
-final reportListProvider = FutureProvider<List<FactoryReport>>((ref) {
+final reportListProvider = FutureProvider<List<FactoryReportModel>>((ref) {
   return ref.read(reportRepositoryProvider).getReports();
 });

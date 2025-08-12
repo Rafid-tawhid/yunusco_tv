@@ -8,5 +8,5 @@ class ReportRepository {
 
   ReportRepository(this.service);
 
-  Future<List<FactoryReport>> getReports() => service.getAll();
+  Future<List<FactoryReportModel>> getReports() => service.fetchReports();
 }
