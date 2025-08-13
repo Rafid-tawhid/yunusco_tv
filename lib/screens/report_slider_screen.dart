@@ -3,9 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:yunusco_ppt_tv/providers/report_provider.dart';
+import 'package:yunusco_ppt_tv/services/constants.dart';
 import 'package:yunusco_ppt_tv/services/helper_class.dart';
-import 'models/factory_report_model.dart';
+import '../models/factory_report_model.dart';
+
+
+
 
 class FactoryReportSlider extends ConsumerStatefulWidget {
   const FactoryReportSlider({Key? key}) : super(key: key);
@@ -21,6 +26,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   bool _isPaused = false;
   final FocusNode _mainFocusNode = FocusNode();
   Timer? _refreshTimer;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -33,8 +39,13 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   }
   void _startAutoRefresh() {
     _refreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
-      ref.invalidate(reportListProvider); // Forces re-fetch from API
-      HelperClass.showMessage(message: 'Data refreshed', size: 20);
+      ref.invalidate(reportRepositoryProvider);
+      HelperClass.showMessage(
+        message: _selectedDate != null
+            ? 'Data refreshed for ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'
+            : 'Data refreshed',
+        size: 20,
+      );
     });
   }
 
@@ -112,7 +123,8 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   }
 
   List<FactoryReportModel> _getReports() {
-    final asyncValue = ref.watch(reportListProvider);
+    // Use reportListProvider instead of reportRepositoryProvider
+    final asyncValue = ref.watch(filteredReportListProvider);
     return asyncValue.maybeWhen(
       data: (data) => data,
       orElse: () => [],
@@ -132,7 +144,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
             end: Alignment.bottomRight,
           ),
           boxShadow: [
-          //  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
+            //  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
           ],
         ),
         child: Card(
@@ -144,8 +156,9 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
               children: [
                 // Title
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(Icons.factory, size: 56, color: Colors.blueAccent),
+                    Icon(Icons.factory, size: 48, color: myColors.primaryColor),
                     const SizedBox(width: 20),
                     Expanded(
                       child: Row(
@@ -222,16 +235,50 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     );
   }
 
+  // Add this new method for date picking
+  Future<void> _pickDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+      final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+
+      // Update the state and provider correctly
+      ref.read(selectedDateProvider.notifier).state = formattedDate;
+
+      debugPrint('Selected Date: $formattedDate');
+      HelperClass.showMessage(
+        message: 'Loading data for ${DateFormat('yyyy-MM-dd').format(pickedDate)}',
+        size: 20,
+      );
+    }
+  }
 
 
+
+  // ... keep all your existing methods unchanged ...
 
   @override
   Widget build(BuildContext context) {
-    final reportsAsync = ref.watch(reportListProvider);
+    final reportsAsync = ref.watch(filteredReportListProvider);
 
     return RawKeyboardListener(
       focusNode: _mainFocusNode,
-      onKey: _handleKeyEvent,
+      onKey: (event) {
+        if (event is RawKeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+            _pickDate(); // Add date picker trigger on up arrow
+          } else {
+            _handleKeyEvent(event); // Keep existing key handling
+          }
+        }
+      },
       child: Scaffold(
         backgroundColor: Colors.white,
         body: SafeArea(
@@ -246,18 +293,65 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: IconButton(
-                      onPressed: () {
-                        ref.invalidate(reportListProvider);
-                        HelperClass.showMessage(message: 'Manually refreshed', size: 20);
-                      },
-                      icon: const Icon(Icons.refresh, size: 24),
-                      tooltip: 'Refresh',
+                  // Modified header row with date picker
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (_selectedDate != null)
+                          Text(
+                            DateFormat('MMMM d, yyyy').format(_selectedDate!),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          )
+                        else
+                           Text(
+                            'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: _pickDate,
+                              icon: const Icon(Icons.calendar_today, size: 28),
+                              tooltip: 'Select Date',
+                            ),
+                            const SizedBox(width: 10),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _selectedDate = null; // Clear date filter
+                                });
+                                debugPrint('_selectedDate ${_selectedDate}');
+                                ref.invalidate(filteredReportListProvider);
+                                HelperClass.showMessage(message: 'Showing all dates', size: 20);
+                              },
+                              icon: const Icon(Icons.clear, size: 28),
+                              tooltip: 'Clear Date Filter',
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                ref.invalidate(filteredReportListProvider);
+                                HelperClass.showMessage(message: 'Manually refreshed', size: 20);
+                              },
+                              icon: const Icon(Icons.refresh, size: 24),
+                              tooltip: 'Refresh',
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
 
+                  // Keep the rest of your existing build code exactly the same
                   Expanded(
                     child: PageView.builder(
                       controller: _pageController,
