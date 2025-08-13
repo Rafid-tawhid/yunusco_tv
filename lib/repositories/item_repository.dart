@@ -1,6 +1,7 @@
 
 
-import '../models/item_model.dart';
+import '../models/user_details.dart';
+import '../models/user_model.dart';
 import '../services/api_service.dart';
 
 class UserRepository {
@@ -8,11 +9,10 @@ class UserRepository {
 
   UserRepository(this.apiService);
 
-  Future<List<User>> getUsers() async {
-    try {
-      return await apiService.fetchUsers();
-    } catch (e) {
-      throw Exception('Repository Error: ${e.toString()}');
-    }
+  Future<List<User>> fetchUsers() async {
+    return await apiService.getUsers();
+  }
+  Future<UserDetail> fetchUserDetails(int userId) async {
+    return await apiService.getUserById(userId);
   }
 }
