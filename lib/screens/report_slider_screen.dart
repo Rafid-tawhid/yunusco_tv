@@ -134,7 +134,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   Widget _buildReportCard(FactoryReportModel report) {
     return Center(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
@@ -158,7 +158,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.factory, size: 48, color: myColors.primaryColor),
+                    Icon(Icons.factory, size: 36, color: myColors.primaryColor),
                     const SizedBox(width: 20),
                     Expanded(
                       child: Row(
@@ -166,30 +166,29 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                           Text(
                             report.itemName ?? "Item Name",
                             style: const TextStyle(
-                              fontSize: 40,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
                           ),
                           Spacer(),
-                          Image.asset('assets/icon/icon.png',height: 80,width: 80,)
+                          Image.asset('assets/icon/icon.png',height: 48,width: 48,)
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 40),
-
+                const SizedBox(height: 10),
                 // Metrics Section
                 GridView(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisExtent: 132,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
+                    mainAxisExtent: 90, // reduced from 132
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
                   ),
                   children: [
                     _buildMetricBox(Icons.view_module, "Total Lines", report.totalLine.toString()),
@@ -295,7 +294,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                 children: [
                   // Modified header row with date picker
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -331,7 +330,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                                   _selectedDate = null; // Clear date filter
                                 });
                                 debugPrint('_selectedDate ${_selectedDate}');
-                                ref.invalidate(filteredReportListProvider);
+                                // ref.invalidate(filteredReportListProvider);
                                 HelperClass.showMessage(message: 'Showing all dates', size: 20);
                               },
                               icon: const Icon(Icons.clear, size: 28),
@@ -350,7 +349,6 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                       ],
                     ),
                   ),
-
                   // Keep the rest of your existing build code exactly the same
                   Expanded(
                     child: PageView.builder(
