@@ -9,9 +9,6 @@ import 'package:yunusco_ppt_tv/services/constants.dart';
 import 'package:yunusco_ppt_tv/services/helper_class.dart';
 import '../models/factory_report_model.dart';
 
-
-
-
 class FactoryReportSlider extends ConsumerStatefulWidget {
   const FactoryReportSlider({Key? key}) : super(key: key);
 
@@ -37,18 +34,163 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
       FocusScope.of(context).requestFocus(_mainFocusNode);
     });
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final reportsAsync = ref.watch(filteredReportListProvider);
+
+    return RawKeyboardListener(
+      focusNode: _mainFocusNode,
+      onKey: (event) {
+        if (event is RawKeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+            _pickDate(); // Add date picker trigger on up arrow
+          } else {
+            _handleKeyEvent(event); // Keep existing key handling
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: (_selectedDate != null)
+              ? Text(
+                  DateFormat('MMMM d, yyyy').format(_selectedDate!),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                )
+              : Text(
+                  'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+          actions: [
+            // Modified header row with date picker
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(onPressed: _pickDate, icon: const Icon(Icons.calendar_today, size: 28), tooltip: 'Select Date'),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedDate = null; // Clear date filter
+                          });
+                          debugPrint('_selectedDate ${_selectedDate}');
+                          // ref.invalidate(filteredReportListProvider);
+                          HelperClass.showMessage(message: 'Showing all dates', size: 20);
+                        },
+                        icon: const Icon(Icons.clear, size: 28),
+                        tooltip: 'Clear Date Filter',
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          ref.invalidate(filteredReportListProvider);
+                          HelperClass.showMessage(message: 'Manually refreshed', size: 20);
+                        },
+                        icon: const Icon(Icons.refresh, size: 24),
+                        tooltip: 'Refresh',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: reportsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('Error: $e')),
+            data: (reports) {
+              if (reports.isEmpty) {
+                return const Center(child: Text('No report data available'));
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Keep the rest of your existing build code exactly the same
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: reports.length,
+                      onPageChanged: (index) {
+                        setState(() => _currentPage = index);
+                      },
+                      itemBuilder: (context, index) {
+                        return _buildReportCard(reports[index]);
+                      },
+                    ),
+                  ),
+                  // const SizedBox(height: 12),
+                  // Indicator Dots
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      reports.length,
+                      (index) => Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentPage == index ? 12 : 8,
+                        height: _currentPage == index ? 12 : 8,
+                        decoration: BoxDecoration(color: _currentPage == index ? Colors.blueAccent : Colors.grey[400], shape: BoxShape.circle),
+                      ),
+                    ),
+                  ),
+                 // const SizedBox(height: 12),
+                  // Control Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 12),
+                      Container(
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
+                        child: IconButton(
+                          onPressed: _goToPreviousPage,
+                          icon: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: const Icon(Icons.arrow_back, size: 24, color: Colors.black),
+                          ),
+                          tooltip: 'Previous',
+                        ),
+                      ),
+                      Expanded(
+                        child: IconButton(
+                          onPressed: _togglePause,
+                          icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause, size: 48, color: Colors.grey),
+                          tooltip: _isPaused ? 'Resume' : 'Pause',
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
+                        child: IconButton(
+                          onPressed: _goToNextPage,
+                          icon: Padding(padding: const EdgeInsets.all(12.0), child: const Icon(Icons.arrow_forward, size: 24)),
+                          tooltip: 'Next',
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+
   void _startAutoRefresh() {
     _refreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
       ref.invalidate(reportRepositoryProvider);
-      HelperClass.showMessage(
-        message: _selectedDate != null
-            ? 'Data refreshed for ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}'
-            : 'Data refreshed',
-        size: 20,
-      );
+      HelperClass.showMessage(message: _selectedDate != null ? 'Data refreshed for ${DateFormat('yyyy-MM-dd').format(_selectedDate!)}' : 'Data refreshed', size: 20);
     });
   }
-
 
   @override
   void dispose() {
@@ -59,9 +201,8 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     super.dispose();
   }
 
-
   void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) {
       if (!_isPaused) _goToNextPage();
     });
   }
@@ -73,11 +214,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     setState(() {
       _currentPage = (_currentPage + 1) % reports.length;
     });
-    _pageController.animateToPage(
-      _currentPage,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+    _pageController.animateToPage(_currentPage, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     HapticFeedback.selectionClick();
   }
 
@@ -88,20 +225,15 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     setState(() {
       _currentPage = (_currentPage - 1 + reports.length) % reports.length;
     });
-    _pageController.animateToPage(
-      _currentPage,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+    _pageController.animateToPage(_currentPage, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     HapticFeedback.selectionClick();
   }
 
   void _togglePause() {
-    if(_isPaused){
-      HelperClass.showMessage(message: 'Play',size: 20);
-    }
-    else {
-      HelperClass.showMessage(message: 'Pause',size: 20);
+    if (_isPaused) {
+      HelperClass.showMessage(message: 'Play', size: 20);
+    } else {
+      HelperClass.showMessage(message: 'Pause', size: 20);
     }
     setState(() {
       _isPaused = !_isPaused;
@@ -115,8 +247,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
         _goToNextPage();
       } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
         _goToPreviousPage();
-      } else if (event.logicalKey == LogicalKeyboardKey.enter ||
-          event.logicalKey == LogicalKeyboardKey.select) {
+      } else if (event.logicalKey == LogicalKeyboardKey.enter || event.logicalKey == LogicalKeyboardKey.select) {
         _togglePause();
       }
     }
@@ -125,10 +256,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   List<FactoryReportModel> _getReports() {
     // Use reportListProvider instead of reportRepositoryProvider
     final asyncValue = ref.watch(filteredReportListProvider);
-    return asyncValue.maybeWhen(
-      data: (data) => data,
-      orElse: () => [],
-    );
+    return asyncValue.maybeWhen(data: (data) => data, orElse: () => []);
   }
 
   Widget _buildReportCard(FactoryReportModel report) {
@@ -138,11 +266,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
-          gradient: LinearGradient(
-            colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.6)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: LinearGradient(colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.6)], begin: Alignment.topLeft, end: Alignment.bottomRight),
           boxShadow: [
             //  BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
           ],
@@ -165,14 +289,10 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                         children: [
                           Text(
                             report.itemName ?? "Item Name",
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
                           ),
                           Spacer(),
-                          Image.asset('assets/icon/icon.png',height: 48,width: 48,)
+                          Image.asset('assets/icon/icon.png', height: 48, width: 48),
                         ],
                       ),
                     ),
@@ -211,9 +331,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))
-        ],
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))],
       ),
       child: Row(
         children: [
@@ -236,12 +354,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
 
   // Add this new method for date picking
   Future<void> _pickDate() async {
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-    );
+    final pickedDate = await showDatePicker(context: context, initialDate: _selectedDate ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime.now());
     if (pickedDate != null) {
       setState(() {
         _selectedDate = pickedDate;
@@ -252,186 +365,8 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
       ref.read(selectedDateProvider.notifier).state = formattedDate;
 
       debugPrint('Selected Date: $formattedDate');
-      HelperClass.showMessage(
-        message: 'Loading data for ${DateFormat('yyyy-MM-dd').format(pickedDate)}',
-        size: 20,
-      );
+      HelperClass.showMessage(message: 'Loading data for ${DateFormat('yyyy-MM-dd').format(pickedDate)}', size: 20);
     }
   }
 
-
-
-  // ... keep all your existing methods unchanged ...
-
-  @override
-  Widget build(BuildContext context) {
-    final reportsAsync = ref.watch(filteredReportListProvider);
-
-    return RawKeyboardListener(
-      focusNode: _mainFocusNode,
-      onKey: (event) {
-        if (event is RawKeyDownEvent) {
-          if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-            _pickDate(); // Add date picker trigger on up arrow
-          } else {
-            _handleKeyEvent(event); // Keep existing key handling
-          }
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: reportsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error: $e')),
-            data: (reports) {
-              if (reports.isEmpty) {
-                return const Center(child: Text('No report data available'));
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Modified header row with date picker
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (_selectedDate != null)
-                          Text(
-                            DateFormat('MMMM d, yyyy').format(_selectedDate!),
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          )
-                        else
-                           Text(
-                            'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: _pickDate,
-                              icon: const Icon(Icons.calendar_today, size: 28),
-                              tooltip: 'Select Date',
-                            ),
-                            const SizedBox(width: 10),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _selectedDate = null; // Clear date filter
-                                });
-                                debugPrint('_selectedDate ${_selectedDate}');
-                                // ref.invalidate(filteredReportListProvider);
-                                HelperClass.showMessage(message: 'Showing all dates', size: 20);
-                              },
-                              icon: const Icon(Icons.clear, size: 28),
-                              tooltip: 'Clear Date Filter',
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                ref.invalidate(filteredReportListProvider);
-                                HelperClass.showMessage(message: 'Manually refreshed', size: 20);
-                              },
-                              icon: const Icon(Icons.refresh, size: 24),
-                              tooltip: 'Refresh',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Keep the rest of your existing build code exactly the same
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: reports.length,
-                      onPageChanged: (index) {
-                        setState(() => _currentPage = index);
-                      },
-                      itemBuilder: (context, index) {
-                        return _buildReportCard(reports[index]);
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Indicator Dots
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      reports.length,
-                          (index) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentPage == index ? 12 : 8,
-                        height: _currentPage == index ? 12 : 8,
-                        decoration: BoxDecoration(
-                          color: _currentPage == index
-                              ? Colors.blueAccent
-                              : Colors.grey[400],
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Control Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(width: 12,),
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey.shade200,
-                        ),
-                        child: IconButton(
-                          onPressed: _goToPreviousPage,
-                          icon: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: const Icon(Icons.arrow_back,size: 24,color: Colors.black,),
-                          ),
-                          tooltip: 'Previous',
-                        ),
-                      ),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: _togglePause,
-                          icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause,size: 48,color: Colors.grey,),
-                          tooltip: _isPaused ? 'Resume' : 'Pause',
-                        ),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey.shade200,
-                        ),
-                        child: IconButton(
-                          onPressed: _goToNextPage,
-                          icon: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: const Icon(Icons.arrow_forward,size: 24,),
-                          ),
-                          tooltip: 'Next',
-                        ),
-                      ),
-                      SizedBox(width: 12,),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
 }

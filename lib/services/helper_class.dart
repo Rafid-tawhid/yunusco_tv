@@ -14,4 +14,21 @@ class HelperClass {
         fontSize: size??16.0
     );
   }
+
+
+  Map<String, List<Map<String, dynamic>>> groupBySection(List<Map<String, dynamic>> data) {
+    final Map<String, List<Map<String, dynamic>>> groupedData = {};
+
+    for (var item in data) {
+      final sectionName = item['SectionName'] as String;
+
+      if (!groupedData.containsKey(sectionName)) {
+        groupedData[sectionName] = [];
+      }
+
+      groupedData[sectionName]!.add(item);
+    }
+
+    return groupedData;
+  }
 }

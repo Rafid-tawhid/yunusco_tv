@@ -12,12 +12,9 @@ final reportRepositoryProvider = Provider((ref) {
   return ReportRepository(ref.read(reportServiceProvider));
 });
 
-
 final selectedDateProvider = StateProvider<String?>((ref) => null);
 final filteredReportListProvider = FutureProvider<List<FactoryReportModel>>((ref) {
   final date = ref.watch(selectedDateProvider);
   final repo = ref.watch(reportRepositoryProvider);
-  return repo.getReportsByDate(date??'');
-
-});
+  return repo.getReportsByDate(date??'');});
 

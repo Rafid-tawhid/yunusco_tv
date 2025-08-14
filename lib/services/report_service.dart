@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
 
 class ReportService {
@@ -23,4 +24,29 @@ class ReportService {
       throw Exception('Failed to load reports for date $date');
     }
   }
+
+  Future<DepartmentData> getAllSectionAttendanceInfo(String date) async {
+
+    final url = Uri.parse('${baseUrl}api/Dashboard/ProductionStregnth?date=$date');
+    debugPrint('API Request: $url');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      debugPrint('Response : ${response.body} ');
+      final data = json.decode(response.body);
+
+      final List<EmployeeAttendance> employees = (data['returnvalue'] as List)
+          .map((a) => EmployeeAttendance.fromJson(a))
+          .toList();
+      debugPrint('employees ${employees.length}');
+
+      // Create the grouped model
+      final departmentData = DepartmentData.fromEmployeeList(employees);
+
+      return departmentData;
+    } else {
+      throw Exception('Failed to load reports for date $date');
+    }
+  }
+
 }

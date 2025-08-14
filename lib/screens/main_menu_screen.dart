@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yunusco_ppt_tv/screens/report_slider_screen.dart';
 
+import 'department_attendance_strength_screen.dart';
 import 'item_list_screen.dart';
 
 
@@ -122,7 +123,7 @@ class _TVMenuScreenState extends State<TVMenuScreen> {
 
   void _navigateToCategory(String category,int index) {
     if(index==0){
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>UserListScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>DepartmentAttendanceSlider()));
     }
     if(index==1){
       Navigator.push(context, MaterialPageRoute(builder: (context)=>FactoryReportSlider()));
