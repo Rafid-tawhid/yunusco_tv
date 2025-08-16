@@ -78,7 +78,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                           setState(() {
                             _selectedDate = null; // Clear date filter
                           });
-                          debugPrint('_selectedDate ${_selectedDate}');
+                          debugPrint('_selectedDate $_selectedDate');
                           // ref.invalidate(filteredReportListProvider);
                           HelperClass.showMessage(message: 'Showing all dates', size: 20);
                         },

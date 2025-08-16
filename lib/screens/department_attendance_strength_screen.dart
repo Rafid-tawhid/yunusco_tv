@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:yunusco_ppt_tv/services/constants.dart';
 import '../providers/attendance_provider.dart';
+import '../services/helper_class.dart';
 
 class DepartmentAttendanceSlider extends ConsumerStatefulWidget {
   const DepartmentAttendanceSlider({super.key});
@@ -19,6 +21,7 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
   int _currentPage = 0;
   final FocusNode _focusNode = FocusNode();
   bool _isAutoPlaying = true;
+  DateTime? _selectedDate;
 
   @override
   void initState() {
@@ -36,7 +39,7 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
   }
 
   void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
       if (_pageController.hasClients && _isAutoPlaying) {
         _goToNextPage();
       }
@@ -90,11 +93,51 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
       onKey: _handleKeyEvent,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Production', style: TextStyle(color: Colors.white)),
-          centerTitle: true,
+          title: Row(
+            children: [
+              Text(
+                _selectedDate != null
+                    ? 'Strength on ${DateFormat('MMMM d, yyyy').format(_selectedDate!)}'
+                    : 'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+
           elevation: 0,
           backgroundColor: myColors.primaryColor,
           iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+              onPressed: _pickDate,
+              icon: Icon(Icons.calendar_month),
+            ),
+            SizedBox(width: 10,),
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  _selectedDate = null; // Clear date filter
+                });
+                debugPrint('_selectedDate $_selectedDate');
+                // ref.invalidate(filteredReportListProvider);
+                HelperClass.showMessage(message: 'Showing all dates', size: 20);
+              },
+              icon: const Icon(Icons.clear, size: 28),
+              tooltip: 'Clear Date Filter',
+            ),
+            IconButton(
+              onPressed: () {
+                ref.invalidate(departmentAttendanceProvider);
+                HelperClass.showMessage(message: 'Manually refreshed', size: 20);
+              },
+              icon: const Icon(Icons.refresh, size: 24),
+              tooltip: 'Refresh',
+            ),
+          ],
         ),
         body: Container(
           color: Colors.white,
@@ -321,5 +364,21 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
         ),
       ),
     );
+  }
+
+  Future<void> _pickDate() async {
+    final pickedDate = await showDatePicker(context: context, initialDate: _selectedDate ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime.now());
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
+      final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+
+      // Update the state and provider correctly
+      ref.read(selectedDateProvider2.notifier).state = formattedDate;
+
+      debugPrint('Selected Date: $formattedDate');
+      HelperClass.showMessage(message: 'Loading data for ${DateFormat('yyyy-MM-dd').format(pickedDate)}', size: 20);
+    }
   }
 }
