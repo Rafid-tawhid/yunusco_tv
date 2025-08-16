@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:countup/countup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,14 +54,16 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: myColors.primaryColor,
+          iconTheme: const IconThemeData(color: Colors.white),
           title: (_selectedDate != null)
               ? Text(
                   DateFormat('MMMM d, yyyy').format(_selectedDate!),
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                 )
               : Text(
                   'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
           actions: [
             // Modified header row with date picker
@@ -112,6 +115,13 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: TextButton(onPressed: _togglePause, child: Text(_isPaused ? 'Resume' : 'Pause')),
+                    ),
+                  ),
                   // Keep the rest of your existing build code exactly the same
                   Expanded(
                     child: PageView.builder(
@@ -125,21 +135,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                       },
                     ),
                   ),
-                  // const SizedBox(height: 12),
-                  // Indicator Dots
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      reports.length,
-                      (index) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentPage == index ? 12 : 8,
-                        height: _currentPage == index ? 12 : 8,
-                        decoration: BoxDecoration(color: _currentPage == index ? Colors.blueAccent : Colors.grey[400], shape: BoxShape.circle),
-                      ),
-                    ),
-                  ),
-                 // const SizedBox(height: 12),
+
                   // Control Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -157,10 +153,18 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                         ),
                       ),
                       Expanded(
-                        child: IconButton(
-                          onPressed: _togglePause,
-                          icon: Icon(_isPaused ? Icons.play_arrow : Icons.pause, size: 48, color: Colors.grey),
-                          tooltip: _isPaused ? 'Resume' : 'Pause',
+                        child: // Indicator Dots
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            reports.length,
+                            (index) => Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: _currentPage == index ? 12 : 8,
+                              height: _currentPage == index ? 12 : 8,
+                              decoration: BoxDecoration(color: _currentPage == index ? Colors.blueAccent : Colors.grey[400], shape: BoxShape.circle),
+                            ),
+                          ),
                         ),
                       ),
                       Container(
@@ -174,7 +178,6 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                       SizedBox(width: 12),
                     ],
                   ),
-                  const SizedBox(height: 20),
                 ],
               );
             },
@@ -183,7 +186,6 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
       ),
     );
   }
-
 
   void _startAutoRefresh() {
     _refreshTimer = Timer.periodic(const Duration(minutes: 15), (_) {
@@ -262,8 +264,7 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
   Widget _buildReportCard(FactoryReportModel report) {
     return Center(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           gradient: LinearGradient(colors: [Colors.white.withOpacity(0.8), Colors.white.withOpacity(0.6)], begin: Alignment.topLeft, end: Alignment.bottomRight),
@@ -311,10 +312,10 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
                     crossAxisSpacing: 12,
                   ),
                   children: [
-                    _buildMetricBox(Icons.view_module, "Total Lines", report.totalLine.toString()),
-                    _buildMetricBox(Icons.speed, "Avg. Efficiency", "${report.averageEfficiency}%"),
-                    _buildMetricBox(Icons.inventory, "Quantity", report.quantity.toString()),
-                    _buildMetricBox(Icons.date_range, "Prod. Date", report.productionDate ?? ""),
+                    _buildMetricBox(Icons.view_module, "Total Lines", report.totalLine.toString(),Colors.blue),
+                    _buildMetricBox(Icons.speed, "Avg. Efficiency", "${report.averageEfficiency}",Colors.green),
+                    _buildMetricBox(Icons.inventory, "Quantity", report.quantity.toString(),Colors.purple),
+                    _buildMetricBox(Icons.date_range, "Prod. Date", report.productionDate ?? "",Colors.orange),
                   ],
                 ),
               ],
@@ -325,25 +326,78 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
     );
   }
 
-  Widget _buildMetricBox(IconData icon, String label, String value) {
+  Widget _buildMetricBox(IconData icon, String label, String value, Color boxColor) {
+    // Define a color scheme based on the boxColor
+    final iconColor = boxColor.computeLuminance() > 0.5 ? Colors.black87 : Colors.white;
+    final textColor = boxColor.computeLuminance() > 0.5 ? Colors.black87 : Colors.white;
+    final shadowColor = boxColor.withOpacity(0.3);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5))],
+        color: boxColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor,
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            boxColor,
+            boxColor.withOpacity(0.8),
+          ],
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 32, color: Colors.blueGrey),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 28, color: iconColor),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(label, style: const TextStyle(fontSize: 20, color: Colors.black87)),
-                Text(value, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textColor.withOpacity(0.9),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                label == 'Prod. Date'
+                    ? Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
+                    : Countup(
+                  begin: 0,
+                  end: double.parse(value),
+                  duration: const Duration(seconds: 2),
+                  separator: ',',
+                  style: TextStyle(
+                    fontSize: 26,
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
@@ -368,5 +422,4 @@ class _FactoryReportSliderState extends ConsumerState<FactoryReportSlider> {
       HelperClass.showMessage(message: 'Loading data for ${DateFormat('yyyy-MM-dd').format(pickedDate)}', size: 20);
     }
   }
-
 }

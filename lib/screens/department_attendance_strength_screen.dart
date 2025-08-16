@@ -47,6 +47,7 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
   }
 
   void _toggleAutoPlay() {
+    HelperClass.showMessage(message: _isAutoPlaying ? 'Pause' : 'Play');
     setState(() {
       _isAutoPlaying = !_isAutoPlaying;
     });
@@ -96,14 +97,8 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
           title: Row(
             children: [
               Text(
-                _selectedDate != null
-                    ? 'Strength on ${DateFormat('MMMM d, yyyy').format(_selectedDate!)}'
-                    : 'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+                _selectedDate != null ? 'Strength on ${DateFormat('MMMM d, yyyy').format(_selectedDate!)}' : 'Today : ${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ],
           ),
@@ -112,11 +107,8 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
           backgroundColor: myColors.primaryColor,
           iconTheme: const IconThemeData(color: Colors.white),
           actions: [
-            IconButton(
-              onPressed: _pickDate,
-              icon: Icon(Icons.calendar_month),
-            ),
-            SizedBox(width: 10,),
+            IconButton(onPressed: _pickDate, icon: Icon(Icons.calendar_month)),
+            SizedBox(width: 10),
             IconButton(
               onPressed: () {
                 setState(() {
@@ -151,6 +143,14 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
 
               return Column(
                 children: [
+                  // Play/Pause Button
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: TextButton(
+                      onPressed: _toggleAutoPlay,
+                      child: Text(_isAutoPlaying ? 'Pause' : 'Play', style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
                   Expanded(
                     child: PageView.builder(
                       controller: _pageController,
@@ -159,7 +159,6 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
                       itemBuilder: (context, index) {
                         final sectionName = sectionList[index].key;
                         final employees = sectionList[index].value.employees;
-
                         final int totalPresent = employees.fold(0, (sum, e) => sum + e.present);
                         final int totalAbsent = employees.fold(0, (sum, e) => sum + e.absent);
                         final int totalStrength = employees.fold(0, (sum, e) => sum + e.strength);
@@ -167,23 +166,9 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
                         final double absentPercentage = (totalAbsent / totalStrength * 100);
 
                         return Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: Column(
                             children: [
-                              // Header Section
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: myColors.primaryColor,
-                                  borderRadius: BorderRadius.circular(12),
-                                  boxShadow: [BoxShadow(color: Colors.blue.shade200, blurRadius: 8, offset: const Offset(0, 4))],
-                                ),
-                                child: Column(
-                                  children: [Text(sectionName, style: TextStyle(fontSize: 20, color: Colors.blue.shade100))],
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-
                               // Stats Cards
                               Row(
                                 children: [
@@ -220,8 +205,10 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
                                                   colorList: const [Colors.green, Colors.orange],
                                                   animationDuration: const Duration(milliseconds: 800),
                                                   chartRadius: MediaQuery.of(context).size.width / 4,
+                                                  centerText: sectionName,
+                                                  centerTextStyle: TextStyle(fontSize: 22, color: Colors.black, fontWeight: FontWeight.bold),
                                                   chartType: ChartType.ring,
-                                                  ringStrokeWidth: 24,
+                                                  ringStrokeWidth: 32,
                                                   legendOptions: const LegendOptions(showLegends: true, legendTextStyle: TextStyle(fontWeight: FontWeight.bold)),
                                                   chartValuesOptions: const ChartValuesOptions(
                                                     showChartValues: true,
@@ -298,33 +285,40 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Column(
                       children: [
-                        // Play/Pause Button
-                        IconButton(icon: Icon(_isAutoPlaying ? Icons.pause : Icons.play_arrow, size: 32), color: myColors.primaryColor, onPressed: _toggleAutoPlay),
-                        const SizedBox(height: 8),
-
                         // Navigation Arrows and Indicators
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            SizedBox(width: 10),
                             // Previous Button
-                            IconButton(icon: const Icon(Icons.arrow_back, size: 32), color: myColors.primaryColor, onPressed: _goToPreviousPage),
+                            Container(
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
+                              child: IconButton(icon: const Icon(Icons.arrow_back, size: 32), color: myColors.primaryColor, onPressed: _goToPreviousPage),
+                            ),
 
                             // Page Indicator
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List<Widget>.generate(
-                                sectionList.length,
-                                (index) => Container(
-                                  width: 12,
-                                  height: 12,
-                                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(shape: BoxShape.circle, color: _currentPage == index ? myColors.primaryColor : Colors.grey.shade300),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List<Widget>.generate(
+                                  sectionList.length,
+                                  (index) => Container(
+                                    width: 12,
+                                    height: 12,
+                                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                                    decoration: BoxDecoration(shape: BoxShape.circle, color: _currentPage == index ? myColors.primaryColor : Colors.grey.shade300),
+                                  ),
                                 ),
                               ),
                             ),
 
                             // Next Button
-                            IconButton(icon: const Icon(Icons.arrow_forward, size: 32), color: myColors.primaryColor, onPressed: _goToNextPage),
+                            Container(
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.grey.shade200),
+                              child: IconButton(icon: const Icon(Icons.arrow_forward, size: 32), color: myColors.primaryColor, onPressed: _goToNextPage),
+                            ),
+
+                            SizedBox(width: 10),
                           ],
                         ),
                       ],
