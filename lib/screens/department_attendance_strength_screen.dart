@@ -369,7 +369,7 @@ class _DepartmentAttendanceSliderState extends ConsumerState<DepartmentAttendanc
       final formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
 
       // Update the state and provider correctly
-      ref.read(selectedDateProvider2.notifier).state = formattedDate;
+      ref.read(selectedDateProvider22.notifier).state = formattedDate;
 
       debugPrint('Selected Date: $formattedDate');
       HelperClass.showMessage(message: 'Loading data for ${DateFormat('yyyy-MM-dd').format(pickedDate)}', size: 20);

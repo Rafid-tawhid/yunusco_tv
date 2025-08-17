@@ -7,24 +7,24 @@ import '../models/employee_attendance_model.dart';
 import '../repositories/report_repository.dart';
 import '../services/report_service.dart';
 
-final selectedDateProvider2 = StateProvider<String>((ref) {
+final selectedDateProvider22 = StateProvider<String>((ref) {
   return DateTime.now().toIso8601String().split('T').first; // yyyy-MM-dd
 });
 
 // Provide ReportService
-final reportServiceProvider2 = Provider<ReportService>((ref) {
+final reportServiceProvider22 = Provider<ReportService>((ref) {
   return ReportService();
 });
 
 // Provide ReportRepository
-final reportRepositoryProvider2 = Provider<ReportRepository>((ref) {
-  return ReportRepository(ref.watch(reportServiceProvider2));
+final reportRepositoryProvider22 = Provider<ReportRepository>((ref) {
+  return ReportRepository(ref.watch(reportServiceProvider22));
 });
 
 // Department Attendance FutureProvider
 final departmentAttendanceProvider = FutureProvider<DepartmentData>((ref) {
-  final date = ref.watch(selectedDateProvider2);
-  final repo = ref.watch(reportRepositoryProvider2);
+  final date = ref.watch(selectedDateProvider22);
+  final repo = ref.watch(reportRepositoryProvider22);
   return repo.getAllDeptAttandance(date);
 });
 

@@ -1,10 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../models/employee_attendance_model.dart';
-import '../providers/attendance_provider.dart';
+import '../providers/report_provider.dart';
 import '../services/constants.dart';
 
 Widget buildDepartmentAttendanceSlide(WidgetRef ref) {

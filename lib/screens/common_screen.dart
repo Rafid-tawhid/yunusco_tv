@@ -34,12 +34,14 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 5),
     )..addListener(_handleAnimationUpdate);
     _startAutoPlay();
   }
+
 
   @override
   void didChangeDependencies() {
@@ -115,8 +117,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
       lastDate: DateTime.now(),
     );
     if (picked != null) {
-      ref.read(selectedDateProvider.notifier).state =
-          picked.toIso8601String().split('T').first;
+      ref.read(selectedDateProvider.notifier).state = picked.toIso8601String().split('T').first;
       ref.refresh(filteredReportListProvider);
       ref.refresh(departmentAttendanceProvider);
       ref.refresh(inputIssuesProvider);
@@ -147,6 +148,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
     _pageController.dispose();
     _animationController.dispose();
     _focusNode.dispose();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -178,6 +180,9 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  IconButton(onPressed: (){
+                    Navigator.pop(context);
+                  }, icon: Icon(Icons.arrow_back,color: Colors.white,)),
                   InkWell(
                     onTap: (){
                       _selectDate(context);
