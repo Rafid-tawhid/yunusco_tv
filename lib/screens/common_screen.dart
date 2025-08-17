@@ -6,6 +6,7 @@ import 'package:yunusco_ppt_tv/models/employee_attendance_model.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
 import '../widgets/attendance_slide.dart';
+import '../widgets/input_issues_slide.dart';
 import '../widgets/production_summary.dart';
 
 class SlideDashboardScreen extends ConsumerStatefulWidget {
@@ -165,7 +166,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: myColors.primaryColor,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -177,38 +178,39 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.calendar_today),
-                        onPressed: () => _selectDate(context),
-                        tooltip: 'Select date',
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        selectedDate,
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  InkWell(
+                    onTap: (){
+                      _selectDate(context);
+                    },
+                    child: Row(
+                      children: [
+                       Icon(Icons.calendar_today,color: Colors.white,),
+                        const SizedBox(width: 8),
+                        Text(
+                          selectedDate,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  Row(
-                    children: [
-                      Text(_isPlaying ? 'Pause' : 'Play'),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
-                        onPressed: _togglePlayPause,
-                        tooltip: _isPlaying ? 'Pause' : 'Play',
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        '${_currentPage + 1}/${slides.length}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
+                  InkWell(
+                    onTap: _togglePlayPause,
+                    child: Row(
+                      children: [
+                        Text(_isPlaying ? 'Pause' : 'Play',style: TextStyle(color: Colors.white,),),
+                        const SizedBox(width: 8),
+                        Icon(_isPlaying ? Icons.pause : Icons.play_arrow,color: Colors.white,),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${_currentPage + 1}/${slides.length}',
+                          style: const TextStyle(fontSize: 16,color: Colors.white,),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -229,7 +231,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                 children: [
                   buildProductionSummarySlide(ref),
                   buildDepartmentAttendanceSlide(ref),
-                  _buildInputIssuesSlide(ref),
+                  buildInputIssuesSlide(ref),
                   _buildMMRSlide(ref),
                 ],
               ),
@@ -411,57 +413,6 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
 
 
 
-
-  Widget _buildInputIssuesSlide(WidgetRef ref) {
-    final issuesAsync = ref.watch(inputIssuesProvider);
-
-    return issuesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
-      data: (issues) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Text(
-                'Input Issues',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: slides[3]['color'],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Card(
-                elevation: 3,
-                color: Colors.white,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Issue')),
-                      DataColumn(label: Text('Type')),
-                      DataColumn(label: Text('Line')),
-                    ],
-                    rows: issues.map((issue) {
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(issue.inputRelatedIssueName ?? 'Unknown')),
-                          DataCell(Text(
-                              issue.inputRelatedIssueTypeId?.toString() ?? 'N/A')),
-                          DataCell(Text(issue.lineName ?? 'N/A')),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   Widget _buildMMRSlide(WidgetRef ref) {
     final mmrAsync = ref.watch(mmrProvider);

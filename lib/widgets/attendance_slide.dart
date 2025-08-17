@@ -49,7 +49,9 @@ Widget buildDepartmentAttendanceSlide(WidgetRef ref) {
                     // Department Header
                     Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(gradient: LinearGradient(colors: [slides[1]['color'].withOpacity(0.8), slides[1]['color']])),
+                      decoration: BoxDecoration(
+                        color: myColors.primaryColor
+                      ),
                       child: Row(
                         children: [
                           const Icon(Icons.group, color: Colors.white, size: 32),
@@ -59,7 +61,7 @@ Widget buildDepartmentAttendanceSlide(WidgetRef ref) {
                             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           const Spacer(),
-                          Text('${totalStats.sections} Sections', style: const TextStyle(fontSize: 16, color: Colors.white70)),
+                          Text('${totalStats.sections} Sections', style: const TextStyle(fontSize: 16, color: Colors.white)),
                         ],
                       ),
                     ),
@@ -275,8 +277,8 @@ class _AnimatedSectionCardState extends State<AnimatedSectionCard> with SingleTi
                   // Percentage
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-                    child: Text('${sectionStats.attendanceRate.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    decoration: BoxDecoration( borderRadius: BorderRadius.circular(6)),
+                    child: Text('${sectionStats.attendanceRate.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white)),
                   ),
                 ],
               ),
