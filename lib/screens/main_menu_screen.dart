@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:yunusco_ppt_tv/screens/report_slider_screen.dart';
 
+import 'common_screen.dart';
 import 'department_attendance_strength_screen.dart';
+import 'inpus_issues_screen.dart';
 import 'item_list_screen.dart';
+import 'mmr_screen.dart';
 
 
 
@@ -33,13 +36,13 @@ class _TVMenuScreenState extends State<TVMenuScreen> {
       description: 'Line efficiency, Output tracking, Quality control',
     ),
     MenuItem(
-      title: 'Inventory',
-      icon: Icons.inventory_outlined,
+      title: 'Input\nIssues',
+      icon: Icons.error_outline,
       color: Colors.orangeAccent,
       description: 'Fabric stock, Trims, Finished goods management',
     ),
     MenuItem(
-      title: 'Machinery',
+      title: 'MMR',
       icon: Icons.build_outlined,
       color: Colors.purpleAccent,
       description: 'Equipment status, Maintenance schedules',
@@ -127,6 +130,16 @@ class _TVMenuScreenState extends State<TVMenuScreen> {
     }
     if(index==1){
       Navigator.push(context, MaterialPageRoute(builder: (context)=>FactoryReportSlider()));
+    }
+    if(index==2){
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>InputIssuesScreen()));
+    }
+
+    if(index==3){
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>MMRScreen()));
+    }
+    if(index==7){
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>SlideDashboardScreen()));
     }
     // In a real app, you would navigate to the selected category
     ScaffoldMessenger.of(context).showSnackBar(
@@ -288,6 +301,7 @@ class _TVMenuScreenState extends State<TVMenuScreen> {
             const SizedBox(height: 20),
             Text(
               item.title,
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontSize: isSelected ? 32 : 28,
               ),

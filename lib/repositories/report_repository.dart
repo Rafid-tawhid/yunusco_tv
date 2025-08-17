@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
+import '../models/input_issue_model.dart';
 import '../services/report_service.dart';
 
 class ReportRepository {
@@ -25,5 +26,17 @@ class ReportRepository {
     debugPrint('DATE $date');
     return service.getAllSectionAttendanceInfo(date);
   }
+
+  Future<List<InputIssueModel>> getAllInputRelatedIssues(String date) {
+    debugPrint('DATE $date');
+    return service.getAllInputIssues(date);
+  }
+
+
+  Future<num> getMMR(String date) {
+    debugPrint('MMR DATE $date');
+    return service.getMMR(date);
+  }
 }
 //
+

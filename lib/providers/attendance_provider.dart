@@ -1,6 +1,7 @@
 
 // Date provider (you can set this from a DatePicker, etc.)
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yunusco_ppt_tv/models/input_issue_model.dart';
 
 import '../models/employee_attendance_model.dart';
 import '../repositories/report_repository.dart';
@@ -26,3 +27,6 @@ final departmentAttendanceProvider = FutureProvider<DepartmentData>((ref) {
   final repo = ref.watch(reportRepositoryProvider2);
   return repo.getAllDeptAttandance(date);
 });
+
+
+
