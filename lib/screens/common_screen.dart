@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yunusco_ppt_tv/models/employee_attendance_model.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
+import '../widgets/attendance_slide.dart';
 import '../widgets/production_summary.dart';
 
 class SlideDashboardScreen extends ConsumerStatefulWidget {
@@ -227,7 +228,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                 },
                 children: [
                   buildProductionSummarySlide(ref),
-                  _buildDepartmentAttendanceSlide(ref),
+                  buildDepartmentAttendanceSlide(ref),
                   _buildInputIssuesSlide(ref),
                   _buildMMRSlide(ref),
                 ],
@@ -408,105 +409,6 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
     );
   }
 
-  Widget _buildDepartmentAttendanceSlide(WidgetRef ref) {
-    final attendanceAsync = ref.watch(departmentAttendanceProvider);
-
-    return attendanceAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
-      data: (departmentData) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Text(
-                'Department Attendance',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: slides[1]['color'],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Card(
-                elevation: 3,
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        departmentData.departmentName,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ...departmentData.sections.values.map((section) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  section.sectionName,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                Text(
-                                  getAbsentPresentRatio(section.employees),
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            ...section.employees.map((employee) => Padding(
-                              padding:
-                              const EdgeInsets.only(left: 16, bottom: 8),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text(employee.designation),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      '${employee.present}/${employee.strength}',
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      '${employee.absentPercent.toStringAsFixed(1)}% absent',
-                                      style: TextStyle(
-                                        color: employee.absentPercent > 10
-                                            ? Colors.red
-                                            : Colors.green,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )),
-                            const Divider(),
-                          ],
-                        );
-                      }),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
 
 
@@ -633,14 +535,5 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
     return 'Critical Condition';
   }
 
-  String getAbsentPresentRatio(List<EmployeeAttendance> employees) {
-    int present = 0;
-    int absent = 0;
-    employees.forEach((e) {
-      present = present + e.present;
-      absent = absent + e.absent;
-    });
 
-    return ' (Present-${present}/Absent-$absent/Total Strength- ${present + absent})';
-  }
 }
