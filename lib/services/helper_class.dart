@@ -1,8 +1,18 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class HelperClass {
 
+
+  static double getScreenHeight() {
+    return ui.window.physicalSize.height / ui.window.devicePixelRatio;
+  }
+
+  static double getScreenWidth() {
+    return ui.window.physicalSize.width / ui.window.devicePixelRatio;
+  }
   static showMessage({required String message,double? size, Color? color}){
     Fluttertoast.showToast(
         msg:  message,

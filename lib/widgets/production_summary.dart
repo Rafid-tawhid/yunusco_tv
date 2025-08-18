@@ -2,6 +2,7 @@ import 'package:countup/countup.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yunusco_ppt_tv/services/helper_class.dart';
 
 import '../models/factory_report_model.dart';
 import '../providers/report_provider.dart';
@@ -242,6 +243,9 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
     loading: () => const Center(child: CircularProgressIndicator()),
     error: (error, stack) => Center(child: Text('Error: $error')),
     data: (reports) {
+      num totalLineSum = reports.fold(0, (sum, report) => sum + (report.totalLine ?? 0));
+      num totalQty = reports.fold(0, (sum, report) => sum + (report.quantity ?? 0));
+
       return Column(
         children: [
           Padding(
@@ -255,30 +259,29 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
               ),
             ),
           ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Card(
-                elevation: 1,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    num totalLineSum = reports.fold(0, (sum, report) => sum + (report.totalLine ?? 0));
-                    num totalQty = reports.fold(0, (sum, report) => sum + (report.quantity ?? 0));
-                    return SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
+          Expanded( // Take remaining space
+            child: Card(
+              elevation: 1,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.vertical, // Primary vertical scroll
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal, // Nested horizontal scroll
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
                           minWidth: constraints.maxWidth,
+                          minHeight: constraints.maxHeight,
                         ),
                         child: DataTable(
                           decoration: const BoxDecoration(
                             color: Colors.white,
                           ),
-                          columnSpacing: 24, // Adjust spacing as needed
+                          columnSpacing: 24,
                           columns: const [
                             DataColumn(
                               label: SizedBox(
-                                width: 200, // Set your desired column width
+                                width: 200,
                                 child: Text('Item'),
                               ),
                             ),
@@ -302,12 +305,11 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                             ),
                           ],
                           rows: [
-                            ...reports.map((report) {
-                            return DataRow(
+                            ...reports.map((report) => DataRow(
                               cells: [
                                 DataCell(
                                   SizedBox(
-                                    width: 200, // Match column width
+                                    width: 200,
                                     child: Text(report.itemName ?? 'Unknown'),
                                   ),
                                 ),
@@ -337,44 +339,57 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                                   ),
                                 ),
                               ],
-                            );
-                          }),
+                            )),
                             DataRow(
                               cells: [
                                 DataCell(
                                   SizedBox(
-                                    width: 200, // Match column width
-                                    child: Text('Total Line ',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16),),
+                                    width: 200,
+                                    child: Text(
+                                      'Total Line',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
                                     width: 100,
-                                    child: Text('$totalLineSum',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16)),
+                                    child: Text(
+                                      '$totalLineSum',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
                                     width: 100,
-                                    child: Text('${totalQty} pcs',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 14)),
+                                    child: Text(
+                                      '${totalQty} pcs',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                DataCell(
-                                  SizedBox(
-                                    width: 100,
-                                    child: Text(''),
-                                  ),
-                                ),
+                                DataCell(SizedBox(width: 100)),
                               ],
-                            )
-
-
+                            ),
                           ],
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -383,3 +398,154 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
     },
   );
 }
+
+// Widget _buildProductionReportsSlide(WidgetRef ref) {
+//   final reportsAsync = ref.watch(filteredReportListProvider);
+//
+//   return reportsAsync.when(
+//     loading: () => const Center(child: CircularProgressIndicator()),
+//     error: (error, stack) => Center(child: Text('Error: $error')),
+//     data: (reports) {
+//       return Column(
+//         children: [
+//           Padding(
+//             padding: const EdgeInsets.all(12),
+//             child: Text(
+//               'Production Reports',
+//               style: TextStyle(
+//                 fontSize: 24,
+//                 fontWeight: FontWeight.bold,
+//                 color: slides[2]['color'],
+//               ),
+//             ),
+//           ),
+//           Expanded(
+//             child: Container(
+//               height: HelperClass.getScreenHeight()/2,
+//               padding: const EdgeInsets.symmetric(horizontal: 12),
+//               child: Card(
+//                 elevation: 1,
+//                 child: LayoutBuilder(
+//                   builder: (context, constraints) {
+//                     num totalLineSum = reports.fold(0, (sum, report) => sum + (report.totalLine ?? 0));
+//                     num totalQty = reports.fold(0, (sum, report) => sum + (report.quantity ?? 0));
+//                     return SingleChildScrollView(
+//                       scrollDirection: Axis.horizontal,
+//                       child: ConstrainedBox(
+//                         constraints: BoxConstraints(
+//                           minWidth: constraints.maxWidth,
+//                         ),
+//                         child: DataTable(
+//                           decoration: const BoxDecoration(
+//                             color: Colors.white,
+//                           ),
+//                           columnSpacing: 24, // Adjust spacing as needed
+//                           columns: const [
+//                             DataColumn(
+//                               label: SizedBox(
+//                                 width: 200, // Set your desired column width
+//                                 child: Text('Item'),
+//                               ),
+//                             ),
+//                             DataColumn(
+//                               label: SizedBox(
+//                                 width: 100,
+//                                 child: Text('Line'),
+//                               ),
+//                             ),
+//                             DataColumn(
+//                               label: SizedBox(
+//                                 width: 100,
+//                                 child: Text('Qty'),
+//                               ),
+//                             ),
+//                             DataColumn(
+//                               label: SizedBox(
+//                                 width: 120,
+//                                 child: Text('Efficiency'),
+//                               ),
+//                             ),
+//                           ],
+//                           rows: [
+//                             ...reports.map((report) {
+//                             return DataRow(
+//                               cells: [
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 200, // Match column width
+//                                     child: Text(report.itemName ?? 'Unknown'),
+//                                   ),
+//                                 ),
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 100,
+//                                     child: Text(report.totalLine?.toString() ?? 'N/A'),
+//                                   ),
+//                                 ),
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 100,
+//                                     child: Text(report.quantity?.toString() ?? '0'),
+//                                   ),
+//                                 ),
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 120,
+//                                     child: Text(
+//                                       '${report.averageEfficiency?.toStringAsFixed(1) ?? '0'}%',
+//                                       style: TextStyle(
+//                                         color: (report.averageEfficiency ?? 0) > 80
+//                                             ? Colors.green
+//                                             : Colors.red,
+//                                         fontWeight: FontWeight.bold
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ),
+//                               ],
+//                             );
+//                           }),
+//                             DataRow(
+//                               cells: [
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 200, // Match column width
+//                                     child: Text('Total Line ',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16),),
+//                                   ),
+//                                 ),
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 100,
+//                                     child: Text('$totalLineSum',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16)),
+//                                   ),
+//                                 ),
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 100,
+//                                     child: Text('${totalQty} pcs',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 14)),
+//                                   ),
+//                                 ),
+//                                 DataCell(
+//                                   SizedBox(
+//                                     width: 100,
+//                                     child: Text(''),
+//                                   ),
+//                                 ),
+//                               ],
+//                             )
+//
+//
+//                           ],
+//                         ),
+//                       ),
+//                     );
+//                   },
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       );
+//     },
+//   );
+// }

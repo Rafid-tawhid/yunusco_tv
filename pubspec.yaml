@@ -48,6 +48,7 @@ dependencies:
   fl_chart: ^0.70.2
   pie_chart: ^5.4.0
   countup: ^0.1.4
+  flutter_screenutil: ^5.9.3
 
 
 flutter_launcher_icons:

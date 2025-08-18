@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yunusco_ppt_tv/models/employee_attendance_model.dart';
 import 'package:yunusco_ppt_tv/screens/shipment_slide_Screen.dart';
+import 'package:yunusco_ppt_tv/services/helper_class.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
 import '../widgets/attendance_slide.dart';
@@ -38,7 +39,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 30),
     )..addListener(_handleAnimationUpdate);
     _startAutoPlay();
   }
@@ -78,7 +79,9 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
         _stopAutoPlay();
       }
     });
+    HelperClass.showMessage(message: _isPlaying?'Play':'Pause');
   }
+  //
 
   void _goToNextPage() {
     if (_currentPage < slides.length - 1) {
@@ -313,11 +316,11 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Man Machine Ratio',
+                'Man Vs Machine Ratio(MMR)',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: slides[3]['color'],
+                  color: _getMMRColor(mmr/100),
                 ),
               ),
               const SizedBox(height: 30),
@@ -327,7 +330,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: _getMMRColor(mmr),
+                    color: _getMMRColor(mmr/100),
                     width: 10,
                   ),
                 ),
@@ -337,17 +340,17 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
-                      color: _getMMRColor(mmr),
+                      color: _getMMRColor(mmr/100),
                     ),
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               Text(
-                _getMMRStatus(mmr),
+                _getMMRStatus(mmr/100),
                 style: TextStyle(
                   fontSize: 20,
-                  color: _getMMRColor(mmr),
+                  color: _getMMRColor(mmr/100),
                 ),
               ),
             ],
@@ -360,16 +363,16 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
 
 
   Color _getMMRColor(num mmr) {
-    if (mmr > 90) return Colors.green;
-    if (mmr > 75) return Colors.blue;
-    if (mmr > 50) return Colors.orange;
+    if (mmr > 0 && mmr<2) return Colors.green;
+    // if (mmr > 75) return 'Good Condition';
+    // if (mmr > 50) return 'Needs Attention';
     return Colors.red;
   }
 
   String _getMMRStatus(num mmr) {
-    if (mmr > 90) return 'Excellent Condition';
-    if (mmr > 75) return 'Good Condition';
-    if (mmr > 50) return 'Needs Attention';
+    if (mmr > 0 && mmr<2) return 'Good Condition';
+    // if (mmr > 75) return 'Good Condition';
+    // if (mmr > 50) return 'Needs Attention';
     return 'Critical Condition';
   }
 

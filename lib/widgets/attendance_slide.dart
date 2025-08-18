@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../models/employee_attendance_model.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
@@ -20,15 +21,15 @@ Widget buildDepartmentAttendanceSlide(WidgetRef ref) {
         children: [
           // Header with department stats
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+            padding: EdgeInsets.symmetric(horizontal: 16.h),
             child: Column(
               children: [
                 Text(
-                  'Department Attendance',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: slides[1]['color']),
+                  'Attendance Details',
+                  style: TextStyle(fontSize: 28.h, fontWeight: FontWeight.bold, color: slides[1]['color']),
                 ),
-                const SizedBox(height: 8),
                 AnimatedStatsBar(totalStats: totalStats),
+                SizedBox(height: 4.h,)
               ],
             ),
           ),
@@ -39,24 +40,24 @@ Widget buildDepartmentAttendanceSlide(WidgetRef ref) {
               elevation: 2,
               color: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin:  EdgeInsets.symmetric(horizontal: 20.w),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16.h),
                 child: Column(
                   children: [
                     // Department Header
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.symmetric(horizontal: 16.h,vertical: 8.h),
                       decoration: BoxDecoration(
                         color: myColors.primaryColor
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.group, color: Colors.white, size: 32),
-                          const SizedBox(width: 12),
+                          Icon(Icons.group, color: Colors.white, size: 32.h),
+                          SizedBox(width: 12.h),
                           Text(
                             departmentData.departmentName,
-                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+                            style:  TextStyle(fontSize: 22.h, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           const Spacer(),
                           Text('${totalStats.sections} Sections', style: const TextStyle(fontSize: 16, color: Colors.white)),
@@ -67,7 +68,7 @@ Widget buildDepartmentAttendanceSlide(WidgetRef ref) {
                     // Sections List
                     Expanded(
                       child: ListView.separated(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding:  EdgeInsets.only(top: 8.h),
                         itemCount: departmentData.sections.length,
                         separatorBuilder: (_, __) => const Divider(height: 1),
                         itemBuilder: (context, index) {
@@ -120,9 +121,9 @@ class AnimatedStatsBar extends StatelessWidget {
     return Card(
       elevation: 2,
       color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.h)),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding:  EdgeInsets.symmetric(horizontal: 12.h,vertical: 6.h),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -199,7 +200,7 @@ class _AnimatedSectionCardState extends State<AnimatedSectionCard> with SingleTi
     return ScaleTransition(
       scale: _animation,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        margin: EdgeInsets.symmetric(horizontal: 12.h, vertical: 6.h),
         child: Card(
           elevation: 3,
           color: Colors.white,
@@ -212,39 +213,39 @@ class _AnimatedSectionCardState extends State<AnimatedSectionCard> with SingleTi
                 style: TextStyle(color: slides[1]['color'], fontWeight: FontWeight.bold),
               ),
             ),
-            title: Text(widget.section.sectionName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            title: Text(widget.section.sectionName, style:  TextStyle(fontSize: 22.h, fontWeight: FontWeight.bold)),
             subtitle: Text.rich(
               TextSpan(
                 children: [
-                  const TextSpan(
+                   TextSpan(
                     text: 'Present: ',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.green,
-                      fontSize: 15, // Increased from 13
+                      fontSize: 16.h, // Increased from 13
                     ),
                   ),
                   TextSpan(
                     text: '${sectionStats.present}, ',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.black,
-                      fontSize: 15, // Increased from 13
+                      fontSize: 16.h, // Increased from 13
                     ),
                   ),
 
-                  const TextSpan(
+                   TextSpan(
                     text: 'Absent: ',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red,
-                      fontSize: 15, // Increased from 13
+                      fontSize: 16.h, // Increased from 13
                     ),
                   ),
                   TextSpan(
                     text: '${sectionStats.absent}, ',
-                    style: const TextStyle(
+                    style:  TextStyle(
                       color: Colors.black,
-                      fontSize: 15, // Increased from 13
+                      fontSize: 16.h, // Increased from 13
                     ),
                   ),
 
@@ -274,9 +275,9 @@ class _AnimatedSectionCardState extends State<AnimatedSectionCard> with SingleTi
                 children: [
                   // Percentage
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:  EdgeInsets.symmetric(horizontal: 6.h, vertical: 2.h),
                     decoration: BoxDecoration( borderRadius: BorderRadius.circular(6)),
-                    child: Text('Absenteeism: ${(100-sectionStats.attendanceRate).toStringAsFixed(2)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white)),
+                    child: Text('Absenteeism: ${(100-sectionStats.attendanceRate).toStringAsFixed(2)}%', style:  TextStyle(fontSize: 16.h, fontWeight: FontWeight.bold,color: Colors.white)),
                   ),
                 ],
               ),

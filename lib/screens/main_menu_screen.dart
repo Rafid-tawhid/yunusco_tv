@@ -6,7 +6,6 @@ import 'package:yunusco_ppt_tv/screens/shipment_slide_Screen.dart';
 import 'common_screen.dart';
 import 'department_attendance_strength_screen.dart';
 import 'inpus_issues_screen.dart';
-import 'item_list_screen.dart';
 import 'mmr_screen.dart';
 
 
@@ -158,110 +157,113 @@ class _TVMenuScreenState extends State<TVMenuScreen> {
       body: RawKeyboardListener(
         focusNode: _focusNode,
         onKey: _handleKeyEvent,
-        child: Stack(
-          children: [
-            // Background with gradient
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF0F0C29),
-                    Color(0xFF302B63),
-                    Color(0xFF24243E),
-                  ],
-                ),
-              ),
-            ),
-
-            // Content
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(60, 60, 60, 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Management Report',
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: Text(
-                          menuItems[_selectedIndex].description,
-                          key: ValueKey<int>(_selectedIndex),
-                          style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
-                          ),
-                        ),
-                      )
-
+        child: MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: Stack(
+            children: [
+              // Background with gradient
+              Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color(0xFF0F0C29),
+                      Color(0xFF302B63),
+                      Color(0xFF24243E),
                     ],
                   ),
                 ),
+              ),
 
-                // Menu Items Grid
-                Expanded(
-                  child: Center(
-                    child: SizedBox(
-                      width: 1000, // Fixed width for the grid
-                      child: GridView.builder(
-                        padding: const EdgeInsets.all(40),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: _columns,
-                          crossAxisSpacing: 40,
-                          mainAxisSpacing: 40,
-                          childAspectRatio: 0.8,
+              // Content
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(60, 60, 60, 30),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Management Report',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                          ),
                         ),
-                        itemCount: menuItems.length,
-                        itemBuilder: (context, index) {
-                          return Focus(
-                            focusNode: FocusNode(skipTraversal: true),
-                            canRequestFocus: false,
-                            child: Builder(
-                              builder: (context) {
-                                final isSelected = _selectedIndex == index;
-                                if (isSelected) {
-                                  // This makes sure the selected item is always visible
-                                  Future.delayed(Duration.zero, () {
-                                    Scrollable.ensureVisible(
-                                      context,
-                                      alignment: 0.5,
-                                      duration: const Duration(milliseconds: 300),
-                                    );
-                                  });
-                                }
-                                return _buildMenuItem(
-                                  menuItems[index],
-                                  isSelected,
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedIndex = index;
-                                    });
-                                    _navigateToCategory(menuItems[index].title,index);
-                                  },
-                                );
-                              },
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Text(
+                            menuItems[_selectedIndex].description,
+                            key: ValueKey<int>(_selectedIndex),
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
                             ),
-                          );
-                        },
+                          ),
+                        )
+
+                      ],
+                    ),
+                  ),
+
+                  // Menu Items Grid
+                  Expanded(
+                    child: Center(
+                      child: SizedBox(
+                        width: 1000, // Fixed width for the grid
+                        child: GridView.builder(
+                          padding: const EdgeInsets.all(40),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: _columns,
+                            crossAxisSpacing: 40,
+                            mainAxisSpacing: 40,
+                            childAspectRatio: 0.8,
+                          ),
+                          itemCount: menuItems.length,
+                          itemBuilder: (context, index) {
+                            return Focus(
+                              focusNode: FocusNode(skipTraversal: true),
+                              canRequestFocus: false,
+                              child: Builder(
+                                builder: (context) {
+                                  final isSelected = _selectedIndex == index;
+                                  if (isSelected) {
+                                    // This makes sure the selected item is always visible
+                                    Future.delayed(Duration.zero, () {
+                                      Scrollable.ensureVisible(
+                                        context,
+                                        alignment: 0.5,
+                                        duration: const Duration(milliseconds: 300),
+                                      );
+                                    });
+                                  }
+                                  return _buildMenuItem(
+                                    menuItems[index],
+                                    isSelected,
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedIndex = index;
+                                      });
+                                      _navigateToCategory(menuItems[index].title,index);
+                                    },
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
