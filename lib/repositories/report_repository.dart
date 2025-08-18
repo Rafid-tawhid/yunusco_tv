@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/cupertino.dart';
+import 'package:yunusco_ppt_tv/models/shipment_info_model.dart';
 
 import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
@@ -37,6 +38,12 @@ class ReportRepository {
     debugPrint('MMR DATE $date');
     return service.getMMR(date);
   }
+
+  Future<List<ShipmentInfoModel>> getShipmentDateInfo(String date1,String date2) {
+
+    return service.getShipmentDateInfo(date1,date2);
+  }
+
 }
 //
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yunusco_ppt_tv/models/employee_attendance_model.dart';
+import 'package:yunusco_ppt_tv/screens/shipment_slide_Screen.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
 import '../widgets/attendance_slide.dart';
@@ -237,6 +238,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                   buildProductionSummarySlide(ref),
                   buildDepartmentAttendanceSlide(ref),
                   buildInputIssuesSlide(ref),
+                  ShipmentInfoScreen(),
                   _buildMMRSlide(ref),
                 ],
               ),
@@ -296,126 +298,6 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
       ),
     );
   }
-
-  // ========== Slide Builders ========== //
-
-  // Widget _buildProductionSummarySlide(WidgetRef ref) {
-  //   final reportsAsync = ref.watch(filteredReportListProvider);
-  //
-  //   return reportsAsync.when(
-  //     loading: () => const Center(child: CircularProgressIndicator()),
-  //     error: (error, stack) => Center(child: Text('Error: $error')),
-  //     data: (reports) {
-  //       if (reports.isEmpty) {
-  //         return const Center(child: Text('No production data available'));
-  //       }
-  //
-  //       final totalQuantity = reports.fold(
-  //           0, (sum, item) => sum + (item.quantity!.toInt() ?? 0));
-  //       final avgEfficiency = reports.isEmpty
-  //           ? 0
-  //           : reports.fold(
-  //           0, (sum, item) => sum + (item.averageEfficiency!.toInt() ?? 0)) /
-  //           reports.length;
-  //
-  //       return Row(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Column(
-  //             children: [
-  //               Text(
-  //                 'Production Summary',
-  //                 style: TextStyle(
-  //                   fontSize: 24,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: slides[0]['color'],
-  //                 ),
-  //               ),
-  //               const SizedBox(height: 20),
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.center,
-  //                 children: [
-  //                   _buildSummaryCard(
-  //                     title: 'Total Quantity',
-  //                     value: totalQuantity.toString(),
-  //                     color: slides[0]['color'],
-  //                   ),
-  //                   const SizedBox(width: 20),
-  //                   _buildSummaryCard(
-  //                     title: 'Avg Efficiency',
-  //                     value: '${avgEfficiency.toStringAsFixed(1)}',
-  //                     color: slides[0]['color'],
-  //                   ),
-  //                 ],
-  //               ),
-  //             ],
-  //           ),
-  //           Expanded(child: _buildProductionReportsSlide(ref))
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-
-  Widget _buildProductionReportsSlide(WidgetRef ref) {
-    final reportsAsync = ref.watch(filteredReportListProvider);
-
-    return reportsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
-      data: (reports) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              Text(
-                'Production Reports',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: slides[2]['color'],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Card(
-                elevation: 3,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Item')),
-                      DataColumn(label: Text('Line')),
-                      DataColumn(label: Text('Qty')),
-                      DataColumn(label: Text('Efficiency')),
-                    ],
-                    rows: reports.map((report) {
-                      return DataRow(
-                        cells: [
-                          DataCell(Text(report.itemName ?? 'Unknown')),
-                          DataCell(Text(report.totalLine?.toString() ?? 'N/A')),
-                          DataCell(Text(report.quantity?.toString() ?? '0')),
-                          DataCell(Text(
-                            '${report.averageEfficiency?.toStringAsFixed(1) ?? '0'}%',
-                            style: TextStyle(
-                              color: (report.averageEfficiency ?? 0) > 80
-                                  ? Colors.green
-                                  : Colors.orange,
-                            ),
-                          )),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
 
 
 

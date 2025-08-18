@@ -1,5 +1,6 @@
 // provider/report_provider.dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yunusco_ppt_tv/models/shipment_info_model.dart';
 
 import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
@@ -46,4 +47,10 @@ final departmentAttendanceProvider = FutureProvider<DepartmentData>((ref) {
   final repo = ref.watch(reportRepositoryProvider);
   final date = ref.watch(selectedDateProvider);
   return repo.getAllDeptAttandance(date);
+});
+//5. Shipment info
+final shipmentInfoProvider = FutureProvider<List<ShipmentInfoModel>>((ref) {
+  final repo = ref.watch(reportRepositoryProvider);
+  // final date = ref.watch(selectedDateProvider);
+  return repo.getShipmentDateInfo('date','date');
 });

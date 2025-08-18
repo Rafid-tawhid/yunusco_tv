@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:yunusco_ppt_tv/models/shipment_info_model.dart';
 
 import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
@@ -86,6 +87,25 @@ class ReportService {
       return data['returnvalue'];
     } else {
       throw Exception('Failed to load reports for date $date');
+    }
+  }
+
+  Future<List<ShipmentInfoModel>> getShipmentDateInfo(String date1,String date2) async {
+
+    final url = Uri.parse('${baseUrl}api/Dashboard/MonthlyTAndAAnalysis?FromDate=$date1&ToDate=$date2');
+    debugPrint('API Request: $url');
+    final response = await http.get(url);
+    debugPrint("response.statusCode ${response.body}");
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<ShipmentInfoModel> shipmentInfo = (data['returnvalue'] as List)
+          .map((a) => ShipmentInfoModel.fromJson(a))
+          .toList();
+      debugPrint('shipmentInfo ${shipmentInfo.length}');
+
+      return shipmentInfo;
+    } else {
+      throw Exception('Failed to load reports for date ');
     }
   }
 

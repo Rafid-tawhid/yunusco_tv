@@ -11,4 +11,5 @@ final List<Map<String, dynamic>> slides = [
   {'title': 'Department Attendance', 'color': Colors.green},
   {'title': 'Input Issues', 'color': Colors.purple},
   {'title': 'MMR', 'color': Colors.red},
+  {'title': 'Shipment Info', 'color': myColors.primaryColor},
 ];
