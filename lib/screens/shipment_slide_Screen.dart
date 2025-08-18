@@ -17,6 +17,7 @@ class ShipmentInfoScreen extends ConsumerStatefulWidget {
 class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
   final TextEditingController _date1Controller = TextEditingController();
   final TextEditingController _date2Controller = TextEditingController();
+  bool _initialFetchDone = false;
 
   @override
   void initState() {
@@ -25,14 +26,25 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
     final now = DateTime.now();
     _date1Controller.text = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
     _date2Controller.text = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month + 1, 0));
+  }
 
-    // Fetch initial data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(shipmentProvider.notifier).fetchShipments(
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialFetchDone) {
+      _initialFetchDone = true;
+      _fetchDataIfNeeded();
+    }
+  }
+
+  Future<void> _fetchDataIfNeeded() async {
+    final currentState = ref.read(shipmentProvider);
+    if (currentState.value == null || currentState.value!.isEmpty) {
+      await ref.read(shipmentProvider.notifier).fetchShipments(
         _date1Controller.text,
         _date2Controller.text,
       );
-    });
+    }
   }
 
   @override
