@@ -276,7 +276,7 @@ class _AnimatedSectionCardState extends State<AnimatedSectionCard> with SingleTi
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration( borderRadius: BorderRadius.circular(6)),
-                    child: Text('${sectionStats.attendanceRate.toStringAsFixed(1)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white)),
+                    child: Text('Absenteeism: ${(100-sectionStats.attendanceRate).toStringAsFixed(2)}%', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: Colors.white)),
                   ),
                 ],
               ),
@@ -326,9 +326,9 @@ class _AnimatedSectionCardState extends State<AnimatedSectionCard> with SingleTi
   }
 
   Color _getAttendanceColor(double rate) {
-    if (rate > 90) return Colors.green;
-    if (rate > 75) return Colors.blue;
-    if (rate > 50) return Colors.orange;
+    if (rate > 90) return Colors.blue;
+    if (rate > 75) return Colors.orange;
+    if (rate > 50) return Colors.red;
     return Colors.red;
   }
 }

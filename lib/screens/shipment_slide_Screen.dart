@@ -149,6 +149,7 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
+                                        _buildEnhancedInfoRow('Total Order', (shipment.delivered!+shipment.notDelivered!), Colors.black),
                                         _buildEnhancedInfoRow('Delivered', shipment.delivered, Colors.green),
                                         _buildEnhancedInfoRow('Not Delivered', shipment.notDelivered, Colors.red),
                                         _buildEnhancedInfoRow('Before Shipped', shipment.beforeShiped, Colors.blue),

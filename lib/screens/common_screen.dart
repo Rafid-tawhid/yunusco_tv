@@ -333,7 +333,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                 ),
                 child: Center(
                   child: Text(
-                    '${mmr.toStringAsFixed(1)}%',
+                    '${(mmr/100).toStringAsFixed(2)}%',
                     style: TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,

@@ -220,6 +220,7 @@ Widget _buildSummaryCard({
           Countup(
             begin: 0,
             end: double.parse(value.toString()),
+            suffix: title=='Avg Efficiency'?'%':'',
             duration: const Duration(seconds: 2),
             separator: ',',
             style: TextStyle(
@@ -261,6 +262,8 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                 elevation: 1,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
+                    num totalLineSum = reports.fold(0, (sum, report) => sum + (report.totalLine ?? 0));
+                    num totalQty = reports.fold(0, (sum, report) => sum + (report.quantity ?? 0));
                     return SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: ConstrainedBox(
@@ -298,7 +301,8 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                               ),
                             ),
                           ],
-                          rows: reports.map((report) {
+                          rows: [
+                            ...reports.map((report) {
                             return DataRow(
                               cells: [
                                 DataCell(
@@ -334,7 +338,38 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                                 ),
                               ],
                             );
-                          }).toList(),
+                          }),
+                            DataRow(
+                              cells: [
+                                DataCell(
+                                  SizedBox(
+                                    width: 200, // Match column width
+                                    child: Text('Total Line ',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16),),
+                                  ),
+                                ),
+                                DataCell(
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text('$totalLineSum',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 16)),
+                                  ),
+                                ),
+                                DataCell(
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text('${totalQty} pcs',style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 14)),
+                                  ),
+                                ),
+                                DataCell(
+                                  SizedBox(
+                                    width: 100,
+                                    child: Text(''),
+                                  ),
+                                ),
+                              ],
+                            )
+
+
+                          ],
                         ),
                       ),
                     );

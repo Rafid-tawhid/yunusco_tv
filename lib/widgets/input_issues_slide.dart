@@ -110,7 +110,7 @@ Widget buildInputIssuesSlide(WidgetRef ref) {
                                   ),
 
                                   // Action button
-                                  Text(issue.lineName ?? 'N/A', style: TextStyle(fontSize: 13, color: Colors.black)),
+                                  Text(issue.lineName ?? 'N/A', style: TextStyle(fontSize: 18, color: Colors.black,fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             );
