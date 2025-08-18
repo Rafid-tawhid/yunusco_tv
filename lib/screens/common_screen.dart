@@ -82,6 +82,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
     HelperClass.showMessage(message: _isPlaying?'Play':'Pause');
   }
   //
+  //
 
   void _goToNextPage() {
     if (_currentPage < slides.length - 1) {
