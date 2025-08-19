@@ -1,10 +1,9 @@
 // Provider for the repository
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yunusco_ppt_tv/services/report_service.dart';
+import 'package:yunusco_ppt_tv/services/api_report_service.dart';
 
 import '../models/shipment_info_model.dart';
 import '../repositories/report_repository.dart';
-import 'item_provider.dart';
 
 final ReportRepositoryProvider = Provider<ReportService>((ref) => ReportService());
 final reportRepositoryProvider = Provider<ReportRepository>((ref) {
