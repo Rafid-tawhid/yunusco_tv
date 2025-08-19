@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           builder: FToastBuilder(),
           theme: ThemeData(primarySwatch: Colors.blue),
           home: const SlideDashboardScreen(),
-         // home: const ProPrctice(),
+          //home: const ProPrctice(),
         );
       },
     );

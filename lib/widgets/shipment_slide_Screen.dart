@@ -16,17 +16,23 @@ class ShipmentInfoScreen extends ConsumerStatefulWidget {
 }
 
 class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
-  final TextEditingController _date1Controller = TextEditingController();
-  final TextEditingController _date2Controller = TextEditingController();
+  final List<String> months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  final List<int> years = List.generate(3, (index) => DateTime.now().year - 2 + index);
+
+  String? selectedMonth;
+  int? selectedYear;
   bool _initialFetchDone = false;
 
   @override
   void initState() {
     super.initState();
-    // Set default dates (e.g., current month)
     final now = DateTime.now();
-    _date1Controller.text = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month, 1));
-    _date2Controller.text = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month + 1, 0));
+    selectedMonth = months[now.month - 1];
+    selectedYear = now.year;
   }
 
   @override
@@ -41,11 +47,21 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
   Future<void> _fetchDataIfNeeded() async {
     final currentState = ref.read(shipmentProvider);
     if (currentState.value == null || currentState.value!.isEmpty) {
-      await ref.read(shipmentProvider.notifier).fetchShipments(
-        _date1Controller.text,
-        _date2Controller.text,
-      );
+      await _fetchShipmentData();
     }
+  }
+
+  Future<void> _fetchShipmentData() async {
+    if (selectedMonth == null || selectedYear == null) return;
+
+    final monthIndex = months.indexOf(selectedMonth!) + 1;
+    final firstDay = DateTime(selectedYear!, monthIndex, 1);
+    final lastDay = DateTime(selectedYear!, monthIndex + 1, 0);
+
+    await ref.read(shipmentProvider.notifier).fetchShipments(
+      DateFormat('yyyy-MM-dd').format(firstDay),
+      DateFormat('yyyy-MM-dd').format(lastDay),
+    );
   }
 
   @override
@@ -60,6 +76,103 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(
+              height: 20.h,
+            ),
+            Row(
+              children: [
+                Text(
+                  'Shipment Info',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                // Year Dropdown
+                Container(
+                  width: 140,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: Colors.grey.shade400,
+                      width: 1,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<int>(
+                      value: selectedYear,
+                      isExpanded: true,
+                      underline: SizedBox(), // Remove default underline
+                      icon: Icon(Icons.arrow_drop_down, color: Colors.grey.shade700),
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                      dropdownColor: Colors.white,
+                      items: years.map((year) {
+                        return DropdownMenuItem(
+                          value: year,
+                          child: Text(
+                            year.toString(),
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedYear = value;
+                        });
+                        _fetchShipmentData();
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                //   Month Dropdown
+                Container(
+                  width: 140,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(
+                      color: Colors.grey.shade400,
+                      width: 1,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButton<String>(
+                      value: selectedMonth,
+                      isExpanded: true,
+                      underline: SizedBox(), // Remove default underline
+                      icon: Icon(Icons.arrow_drop_down, color: Colors.grey.shade700),
+                      style: TextStyle(fontSize: 14, color: Colors.black),
+                      dropdownColor: Colors.white,
+                      items: months.map((month) {
+                        return DropdownMenuItem(
+                          value: month,
+                          child: Text(
+                            month,
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedMonth = value;
+                        });
+                        _fetchShipmentData();
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+
+              ],
+            ),
+            SizedBox(
+              height: 10.h,
+            ),
             Expanded(
               child: shipmentState.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
@@ -84,62 +197,6 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 16.h,),
-                              Text('Shipment Info',style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),),
-                              SizedBox(height: 8.h,),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 40.h, // Fixed minimal height
-                                      child: TextField(
-                                        controller: _date1Controller,
-                                        decoration: const InputDecoration(
-                                          labelText: 'From Date',
-                                          border: OutlineInputBorder(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Reduced padding
-                                          isDense: true, // Reduces internal padding
-                                        ),
-                                        style: TextStyle(fontSize: 14), // Smaller font
-                                        readOnly: true,
-                                        onTap: () => _selectDate(context, _date1Controller),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 40.h, // Fixed minimal height
-                                      child: TextField(
-                                        controller: _date2Controller,
-                                        decoration: const InputDecoration(
-                                          labelText: 'To Date',
-                                          border: OutlineInputBorder(),
-                                          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                          isDense: true,
-                                        ),
-                                        style: TextStyle(fontSize: 14),
-                                        readOnly: true,
-                                        onTap: () => _selectDate(context, _date2Controller),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 40,
-                                    height: 40,
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero, // Remove button padding
-                                      icon: const Icon(Icons.search, size: 20),
-                                      onPressed: () {
-                                        ref.read(shipmentProvider.notifier).fetchShipments(
-                                          _date1Controller.text,
-                                          _date2Controller.text,
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8.h,),
                               // Month Header
                               Text(
                                 shipment.monthYear ?? 'N/A',
@@ -160,7 +217,7 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         SizedBox(
-                                          height: 360.h,
+                                          height: 380.h,
                                           child: _buildDeliveryPieChart(shipment),
                                         ),
                                         Text('Delivery Details Chart')
@@ -232,7 +289,7 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
               value: notDelivered.toDouble(),
               color: Colors.red,
               title: '100% Pending',
-              radius: 70.h,
+              radius: 80.h,
             ),
           ],
         ),
@@ -242,21 +299,21 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
     return PieChart(
       PieChartData(
         sectionsSpace: 0,
-        centerSpaceRadius: 90.h,
+        centerSpaceRadius: 80.h,
         sections: [
           PieChartSectionData(
             value: (shipment.beforeShiped ?? 0).toDouble(),
             color: Colors.blue,
             titleStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
             title: '${((shipment.beforeShiped ?? 0) / delivered * 100).toStringAsFixed(1)}%',
-            radius: 80.h,
+            radius: 100.h,
           ),
           PieChartSectionData(
             value: (shipment.timelyShiped ?? 0).toDouble(),
             color: Colors.green,
             titleStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
             title: '${((shipment.timelyShiped ?? 0) / delivered * 100).toStringAsFixed(1)}%',
-            radius: 80.h,
+            radius: 100.h,
           ),
           PieChartSectionData(
             value: (shipment.oneWeekDelay ?? 0).toDouble(),
@@ -264,21 +321,21 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
 
             titleStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
             title: '${((shipment.oneWeekDelay ?? 0) / delivered * 100).toStringAsFixed(1)}%',
-            radius: 80.h,
+            radius: 100.h,
           ),
           PieChartSectionData(
             value: (shipment.twoWeekDelay ?? 0).toDouble(),
             color: Colors.amber,
             titleStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
             title: '${((shipment.twoWeekDelay ?? 0) / delivered * 100).toStringAsFixed(1)}%',
-            radius: 80.h,
+            radius: 100.h,
           ),
           PieChartSectionData(
             value: (shipment.moreTwoWeekDelay ?? 0).toDouble(),
             color: Colors.purple,
             titleStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
             title: '${((shipment.moreTwoWeekDelay ?? 0) / delivered * 100).toStringAsFixed(1)}%',
-            radius: 80.h,
+            radius: 100.h,
           ),
         ],
       ),
@@ -336,8 +393,6 @@ class _ShipmentInfoScreenState extends ConsumerState<ShipmentInfoScreen> {
 
   @override
   void dispose() {
-    _date1Controller.dispose();
-    _date2Controller.dispose();
     super.dispose();
   }
 }
