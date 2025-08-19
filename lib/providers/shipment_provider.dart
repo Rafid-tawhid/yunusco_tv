@@ -6,6 +6,7 @@ import '../models/shipment_info_model.dart';
 import '../repositories/report_repository.dart';
 
 final ReportRepositoryProvider = Provider<ReportService>((ref) => ReportService());
+
 final reportRepositoryProvider = Provider<ReportRepository>((ref) {
   return ReportRepository(ref.read(ReportRepositoryProvider));
 });
@@ -15,7 +16,7 @@ final reportRepositoryProvider = Provider<ReportRepository>((ref) {
 class ShipmentNotifier extends StateNotifier<AsyncValue<List<ShipmentInfoModel>>> {
   final ReportService repository;
 
-  ShipmentNotifier(this.repository) : super(const AsyncValue.loading());
+    ShipmentNotifier(this.repository) : super(const AsyncValue.loading());
 
   Future<void> fetchShipments(String date1, String date2) async {
     state = const AsyncValue.loading();
