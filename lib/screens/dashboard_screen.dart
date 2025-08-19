@@ -1,9 +1,7 @@
-import 'package:countup/countup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:yunusco_ppt_tv/models/employee_attendance_model.dart';
-import 'package:yunusco_ppt_tv/screens/shipment_slide_Screen.dart';
+import 'package:yunusco_ppt_tv/widgets/shipment_slide_Screen.dart';
 import 'package:yunusco_ppt_tv/services/helper_class.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
@@ -81,6 +79,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
     });
     HelperClass.showMessage(message: _isPlaying?'Play':'Pause');
   }
+  //
   //
 
   void _goToNextPage() {
@@ -191,34 +190,41 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                     onTap: (){
                       _selectDate(context);
                     },
-                    child: Row(
-                      children: [
-                       Icon(Icons.calendar_today,color: Colors.white,),
-                        const SizedBox(width: 8),
-                        Text(
-                          selectedDate,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        children: [
+                         Icon(Icons.calendar_today,color: Colors.white,),
+                          const SizedBox(width: 8),
+                          Text(
+                            selectedDate,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
+                  //
                   InkWell(
                     onTap: _togglePlayPause,
-                    child: Row(
-                      children: [
-                        Text(_isPlaying ? 'Pause' : 'Play',style: TextStyle(color: Colors.white,),),
-                        const SizedBox(width: 8),
-                        Icon(_isPlaying ? Icons.pause : Icons.play_arrow,color: Colors.white,),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${_currentPage + 1}/${slides.length}',
-                          style: const TextStyle(fontSize: 16,color: Colors.white,),
-                        ),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        children: [
+                          Text(_isPlaying ? 'Pause' : 'Play',style: TextStyle(color: Colors.white,),),
+                          const SizedBox(width: 8),
+                          Icon(_isPlaying ? Icons.pause : Icons.play_arrow,color: Colors.white,),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${_currentPage + 1}/${slides.length}',
+                            style: const TextStyle(fontSize: 16,color: Colors.white,),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

@@ -32,8 +32,6 @@ Widget buildProductionSummarySlide(WidgetRef ref) {
         valMap[e.itemName ?? 'Unknown'] = e.averageEfficiency?.toDouble() ?? 0.0;
       }
 
-      debugPrint("valMap $valMap");
-
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
