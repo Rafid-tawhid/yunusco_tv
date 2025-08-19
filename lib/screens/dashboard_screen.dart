@@ -208,7 +208,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                       ),
                     ),
                   ),
-
+                  //
                   InkWell(
                     onTap: _togglePlayPause,
                     child: Padding(
