@@ -34,6 +34,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _animationController = AnimationController(
       vsync: this,

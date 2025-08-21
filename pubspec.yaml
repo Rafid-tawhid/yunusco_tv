@@ -39,7 +39,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
   riverpod: ^2.6.1
   # For state management
-  http: ^1.1.0               # For API calls
+  dio: ^5.9.0               # For API calls
   shared_preferences: ^2.2.0 # For local storage
   http_interceptor: ^2.0.0
   fluttertoast: ^8.2.12

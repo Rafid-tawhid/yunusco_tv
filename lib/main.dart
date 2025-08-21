@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:yunusco_ppt_tv/screens/dashboard_screen.dart';
-import 'package:yunusco_ppt_tv/temp/stl.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
