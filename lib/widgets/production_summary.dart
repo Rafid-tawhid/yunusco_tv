@@ -43,7 +43,7 @@ Widget buildProductionSummarySlide(WidgetRef ref) {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  height: 400,
+                  height: 380,
                   width: 380,
                   child: BeautifulPieChart(
                     title: "Efficiency Distribution",
@@ -103,11 +103,18 @@ class BeautifulPieChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = [
-      Colors.blueAccent,
-      Colors.greenAccent,
-      Colors.orangeAccent,
-      Colors.purpleAccent,
-      Colors.redAccent,
+      Color(0xFF4285F4), // Blue
+      Color(0xFFEA4335), // Red
+      Color(0xFFFBBC05), // Yellow
+      Color(0xFF34A853), // Green
+      Color(0xFF9C27B0), // Purple
+      Color(0xFFFF9800), // Orange
+      Color(0xFF00BCD4), // Cyan
+      Color(0xFFE91E63), // Pink
+      Color(0xFF8BC34A), // Light Green
+      Color(0xFF795548), // Brown
+      Color(0xFF607D8B), // Blue Grey
+      Color(0xFF9E9E9E), // Grey
     ];
 
     final data = valueMap.entries.map((entry) {
@@ -116,9 +123,9 @@ class BeautifulPieChart extends StatelessWidget {
         color: colors[index % colors.length],
         value: entry.value,
         title: '${entry.value.toStringAsFixed(1)}%',
-        radius: 74,
+        radius: 84,
         titleStyle: const TextStyle(
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
@@ -145,17 +152,17 @@ class BeautifulPieChart extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             SizedBox(
-              height: 200,
+              height: 220,
               child: PieChart(
                 PieChartData(
                   sections: data,
-                  centerSpaceRadius: 40,
+                  centerSpaceRadius: 30,
                   sectionsSpace: 2,
                   startDegreeOffset: -90,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Wrap(
