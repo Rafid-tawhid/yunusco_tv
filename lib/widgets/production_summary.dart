@@ -2,6 +2,7 @@ import 'package:countup/countup.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:yunusco_ppt_tv/services/helper_class.dart';
 
 import '../models/factory_report_model.dart';
@@ -43,7 +44,7 @@ Widget buildProductionSummarySlide(WidgetRef ref) {
               children: [
                 SizedBox(
                   height: 400,
-                  width: 400,
+                  width: 380,
                   child: BeautifulPieChart(
                     title: "Efficiency Distribution",
                     valueMap: valMap,
@@ -115,7 +116,7 @@ class BeautifulPieChart extends StatelessWidget {
         color: colors[index % colors.length],
         value: entry.value,
         title: '${entry.value.toStringAsFixed(1)}%',
-        radius: 70,
+        radius: 74,
         titleStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
@@ -275,29 +276,29 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                           decoration: const BoxDecoration(
                             color: Colors.white,
                           ),
-                          columnSpacing: 24,
-                          columns: const [
+                          columnSpacing: 12,
+                          columns:  [
                             DataColumn(
                               label: SizedBox(
-                                width: 200,
+                                width: 200.w,
                                 child: Text('Item'),
                               ),
                             ),
                             DataColumn(
                               label: SizedBox(
-                                width: 100,
+                                width: 60.w,
                                 child: Text('Line'),
                               ),
                             ),
                             DataColumn(
                               label: SizedBox(
-                                width: 100,
+                                width: 100.w,
                                 child: Text('Qty'),
                               ),
                             ),
                             DataColumn(
                               label: SizedBox(
-                                width: 120,
+                                width: 120.w,
                                 child: Text('Efficiency'),
                               ),
                             ),
@@ -307,25 +308,25 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                               cells: [
                                 DataCell(
                                   SizedBox(
-                                    width: 200,
+                                    width: 200.w,
                                     child: Text(report.itemName ?? 'Unknown'),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 100,
+                                    width: 60.w,
                                     child: Text(report.totalLine?.toString() ?? 'N/A'),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 100,
+                                    width: 100.w,
                                     child: Text(report.quantity?.toString() ?? '0'),
                                   ),
                                 ),
                                 DataCell(
                                   SizedBox(
-                                    width: 120,
+                                    width: 120.w,
                                     child: Text(
                                       '${report.averageEfficiency?.toStringAsFixed(1) ?? '0'}%',
                                       style: TextStyle(
