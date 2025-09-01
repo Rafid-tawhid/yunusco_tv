@@ -12,7 +12,6 @@ import '../services/constants.dart';
 Widget buildProductionSummarySlide(WidgetRef ref) {
   final reportsAsync = ref.watch(filteredReportListProvider);
 
-
   return reportsAsync.when(
     loading: () => const Center(child: CircularProgressIndicator()),
     error: (error, stack) => Center(child: Text('Error: $error')),
@@ -21,13 +20,8 @@ Widget buildProductionSummarySlide(WidgetRef ref) {
         return const Center(child: Text('No production data available'));
       }
 
-      final totalQuantity = reports.fold(
-          0, (sum, item) => sum + (item.quantity!.toInt() ?? 0));
-      final avgEfficiency = reports.isEmpty
-          ? 0
-          : reports.fold(
-          0, (sum, item) => sum + (item.averageEfficiency!.toInt() ?? 0)) /
-          reports.length;
+      final totalQuantity = reports.fold(0, (sum, item) => sum + (item.quantity!.toInt() ?? 0));
+      final avgEfficiency = reports.isEmpty ? 0 : reports.fold(0, (sum, item) => sum + (item.averageEfficiency!.toInt() ?? 0)) / reports.length;
       final valMap = <String, double>{};
       for (final e in reports) {
         valMap[e.itemName ?? 'Unknown'] = e.averageEfficiency?.toDouble() ?? 0.0;
@@ -51,30 +45,11 @@ Widget buildProductionSummarySlide(WidgetRef ref) {
                     titleColor: Colors.blue, // Optional
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Production Summary',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: slides[0]['color'],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
                 Row(
                   children: [
-                    _buildSummaryCard(
-                      title: 'Total Quantity',
-                      value: totalQuantity.toString(),
-                      color: slides[0]['color'],
-                    ),
-                    const SizedBox(width: 20),
-                    _buildSummaryCard(
-                      title: 'Avg Efficiency',
-                      value: avgEfficiency.toStringAsFixed(1),
-                      color: slides[0]['color'],
-                    ),
+                    _buildSummaryCard(title: 'Quantity :', value: totalQuantity.toString(), color: Colors.black),
+                    const SizedBox(width: 10),
+                    _buildSummaryCard(title: 'Avg Efficiency :', value: avgEfficiency.toStringAsFixed(1), color: Colors.black),
                   ],
                 ),
               ],
@@ -85,20 +60,14 @@ Widget buildProductionSummarySlide(WidgetRef ref) {
       );
     },
   );
-  
-  
 }
+
 class BeautifulPieChart extends StatelessWidget {
   final String title;
   final Map<String, double> valueMap;
   final Color? titleColor;
 
-  const BeautifulPieChart({
-    super.key,
-    required this.title,
-    required this.valueMap,
-    this.titleColor,
-  });
+  const BeautifulPieChart({super.key, required this.title, required this.valueMap, this.titleColor});
 
   @override
   Widget build(BuildContext context) {
@@ -124,44 +93,24 @@ class BeautifulPieChart extends StatelessWidget {
         value: entry.value,
         title: '${entry.value.toStringAsFixed(1)}%',
         radius: 84,
-        titleStyle: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
+        titleStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
       );
     }).toList();
 
     return Card(
       elevation: 6,
       color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: titleColor ?? Theme.of(context).primaryColor,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: titleColor ?? Theme.of(context).primaryColor),
             ),
             const SizedBox(height: 16),
-            SizedBox(
-              height: 220,
-              child: PieChart(
-                PieChartData(
-                  sections: data,
-                  centerSpaceRadius: 30,
-                  sectionsSpace: 2,
-                  startDegreeOffset: -90,
-                ),
-              ),
-            ),
+            SizedBox(height: 220, child: PieChart(PieChartData(sections: data, centerSpaceRadius: 30, sectionsSpace: 2, startDegreeOffset: -90))),
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -170,10 +119,7 @@ class BeautifulPieChart extends StatelessWidget {
                 runSpacing: 8,
                 children: valueMap.keys.map((label) {
                   final index = valueMap.keys.toList().indexOf(label);
-                  return _buildLegendItem(
-                    colors[index % colors.length],
-                    label,
-                  );
+                  return _buildLegendItem(colors[index % colors.length], label);
                 }).toList(),
               ),
             ),
@@ -190,51 +136,32 @@ class BeautifulPieChart extends StatelessWidget {
         Container(
           width: 12,
           height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 6),
-        Text(
-          text,
-          style: const TextStyle(fontSize: 12),
-        ),
+        Text(text, style: const TextStyle(fontSize: 12)),
       ],
     );
   }
 }
-Widget _buildSummaryCard({
-  required String title,
-  required String value,
-  required Color color,
-}) {
+
+Widget _buildSummaryCard({required String title, required String value, required Color color}) {
   return Card(
-    elevation: 1,
+    elevation: 0,
     color: Colors.white,
     child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
+      padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 12),
+      child: Row(
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              color: color,
-            ),
-          ),
+          Text(title, style: TextStyle(fontSize: 18, color: color)),
           const SizedBox(height: 8),
           Countup(
             begin: 0,
             end: double.parse(value.toString()),
-            suffix: title=='Avg Efficiency'?'%':'',
+            suffix: title == 'Avg Efficiency :' ? '%' : '',
             duration: const Duration(seconds: 2),
             separator: ',',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
           ),
         ],
       ),
@@ -251,21 +178,29 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
     data: (reports) {
       num totalLineSum = reports.fold(0, (sum, report) => sum + (report.totalLine ?? 0));
       num totalQty = reports.fold(0, (sum, report) => sum + (report.quantity ?? 0));
+      final totalQuantity = reports.fold(0, (sum, item) => sum + (item.quantity!.toInt() ?? 0));
+      final avgEfficiency = reports.isEmpty ? 0 : reports.fold(0, (sum, item) => sum + (item.averageEfficiency!.toInt() ?? 0)) / reports.length;
+      final valMap = <String, double>{};
+      for (final e in reports) {
+        valMap[e.itemName ?? 'Unknown'] = e.averageEfficiency?.toDouble() ?? 0.0;
+      }
 
       return Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Text(
-              'Production Reports',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: slides[2]['color'],
-              ),
+            child: Row(
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                  'Production Reports',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: slides[2]['color']),
+                ),
+              ],
             ),
           ),
-          Expanded( // Take remaining space
+          Expanded(
+            // Take remaining space
             child: Card(
               elevation: 1,
               child: LayoutBuilder(
@@ -275,77 +210,43 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal, // Nested horizontal scroll
                       child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minWidth: constraints.maxWidth,
-                          minHeight: constraints.maxHeight,
-                        ),
+                        constraints: BoxConstraints(minWidth: constraints.maxWidth, minHeight: constraints.maxHeight),
                         child: DataTable(
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                          ),
+                          decoration: const BoxDecoration(color: Colors.white),
                           columnSpacing: 12,
-                          columns:  [
+                          columns: [
                             DataColumn(
-                              label: SizedBox(
-                                width: 200.w,
-                                child: Text('Item'),
-                              ),
+                              label: SizedBox(width: 200.w, child: Text('Item')),
                             ),
                             DataColumn(
-                              label: SizedBox(
-                                width: 60.w,
-                                child: Text('Line'),
-                              ),
+                              label: SizedBox(width: 60.w, child: Text('Line')),
                             ),
                             DataColumn(
-                              label: SizedBox(
-                                width: 100.w,
-                                child: Text('Qty'),
-                              ),
+                              label: SizedBox(width: 100.w, child: Text('Qty')),
                             ),
                             DataColumn(
-                              label: SizedBox(
-                                width: 120.w,
-                                child: Text('Efficiency'),
-                              ),
+                              label: SizedBox(width: 120.w, child: Text('Efficiency')),
                             ),
                           ],
                           rows: [
-                            ...reports.map((report) => DataRow(
-                              cells: [
-                                DataCell(
-                                  SizedBox(
-                                    width: 200.w,
-                                    child: Text(report.itemName ?? 'Unknown'),
-                                  ),
-                                ),
-                                DataCell(
-                                  SizedBox(
-                                    width: 60.w,
-                                    child: Text(report.totalLine?.toString() ?? 'N/A'),
-                                  ),
-                                ),
-                                DataCell(
-                                  SizedBox(
-                                    width: 100.w,
-                                    child: Text(report.quantity?.toString() ?? '0'),
-                                  ),
-                                ),
-                                DataCell(
-                                  SizedBox(
-                                    width: 120.w,
-                                    child: Text(
-                                      '${report.averageEfficiency?.toStringAsFixed(1) ?? '0'}%',
-                                      style: TextStyle(
-                                        color: (report.averageEfficiency ?? 0) > 80
-                                            ? Colors.green
-                                            : Colors.orange,
+                            ...reports.map(
+                              (report) => DataRow(
+                                cells: [
+                                  DataCell(SizedBox(width: 200.w, child: Text(report.itemName ?? 'Unknown'))),
+                                  DataCell(SizedBox(width: 60.w, child: Text(report.totalLine?.toString() ?? 'N/A'))),
+                                  DataCell(SizedBox(width: 100.w, child: Text(report.quantity?.toString() ?? '0'))),
+                                  DataCell(
+                                    SizedBox(
+                                      width: 120.w,
+                                      child: Text(
+                                        '${report.averageEfficiency?.toStringAsFixed(1) ?? '0'}%',
+                                        style: TextStyle(color: (report.averageEfficiency ?? 0) > 80 ? Colors.green : Colors.orange),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            )),
+                                ],
+                              ),
+                            ),
                             DataRow(
                               cells: [
                                 DataCell(
@@ -353,11 +254,7 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                                     width: 200,
                                     child: Text(
                                       'Total Line',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
+                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
                                     ),
                                   ),
                                 ),
@@ -366,11 +263,7 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                                     width: 100,
                                     child: Text(
                                       '$totalLineSum',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
+                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
                                     ),
                                   ),
                                 ),
@@ -379,11 +272,7 @@ Widget _buildProductionReportsSlide(WidgetRef ref) {
                                     width: 100,
                                     child: Text(
                                       '${totalQty} pcs',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
+                                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 14),
                                     ),
                                   ),
                                 ),
