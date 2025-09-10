@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
@@ -67,4 +68,28 @@ class ReportService {
         .map((json) => ShipmentInfoModel.fromJson(json))
         .toList();
   }
+
+
+
+
+  Future<dynamic> getAllDhu(String date) async {
+    final response = await _dio.get('/api/QMS/GetDHU', queryParameters: {
+      'qmsDate': date,
+    });
+
+    final data = response.data;
+    debugPrint('HELLO WORLD ${data}');
+
+    var sectionWiseData=[];
+
+    for(var i in data['Data']['SectionWiseDHU']){
+      sectionWiseData.add(i);
+    }
+
+    debugPrint('sectionWiseData ${sectionWiseData.length}');
+
+    return sectionWiseData;
+  }
+
+
 }

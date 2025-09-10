@@ -28,6 +28,14 @@ final mmrProvider = FutureProvider<num>((ref) {
   return repo.getMMR(date);
 });
 
+
+// 1. DHU Report
+final dhuProvider = FutureProvider<dynamic>((ref) {
+  final repo = ref.watch(reportRepositoryProvider);
+  final date = ref.watch(selectedDateProvider);
+  return repo.getAllDhu(date);
+});
+
 // 2. Factory Reports List
 final filteredReportListProvider = FutureProvider<List<FactoryReportModel>>((ref) {
   final repo = ref.watch(reportRepositoryProvider);

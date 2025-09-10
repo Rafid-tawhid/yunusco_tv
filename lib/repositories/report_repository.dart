@@ -39,6 +39,11 @@ class ReportRepository {
     return service.getMMR(date);
   }
 
+  Future<dynamic> getAllDhu(String date) {
+    debugPrint('DHU DATE $date');
+    return service.getAllDhu(date);
+  }
+
   Future<List<ShipmentInfoModel>> getShipmentDateInfo(String date1,String date2) {
 
     return service.getShipmentDateInfo(date1,date2);

@@ -249,7 +249,12 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                   buildDepartmentAttendanceSlide(ref),
                   buildInputIssuesSlide(ref),
                   ShipmentInfoScreen(),
-                  _buildMMRSlide(ref),
+                  Column(
+                    children: [
+                      _buildMMRSlide(ref),
+                      _buildSectionWiseDHU(ref)
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -332,8 +337,8 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
               ),
               const SizedBox(height: 30),
               Container(
-                width: 200,
-                height: 200,
+                width: 160,
+                height: 160,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
@@ -345,7 +350,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                   child: Text(
                     '${(mmr/100).toStringAsFixed(2)}%',
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: _getMMRColor(mmr/100),
                     ),
@@ -360,6 +365,34 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                   color: _getMMRColor(mmr/100),
                 ),
               ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  Widget _buildSectionWiseDHU(WidgetRef ref) {
+    final mmrAsync = ref.watch(dhuProvider);
+
+    return mmrAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('Error: $error')),
+      data: (mmr) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Section wise DHU',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: _getMMRColor(mmr/100),
+                ),
+              ),
+              Text('sectionWiseData $mmrAsync')
             ],
           ),
         );

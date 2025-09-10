@@ -15,6 +15,9 @@ class ApiClient {
       baseUrl: 'http://202.74.243.118:8090/',
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30),
+      // headers: {
+      //   'Authorization': 'Bearer GiPA2Tz/1QGsdmkpeNsEy4pglHJU9AcROG+mrOe/pR5qBKa7aHwuSuNrXoJd1l9W6UaKCbCdykP47wHl5+Y+S99C/XF6pwtKNGQjpxETY7cggiIAovcj+WqlivhTRaIufz8FpNs26qc6/DLcSkC7gCUdgdSZmbS1/PNHe3ukpaU=',
+      // },
     ));
 
     // 2. Add Logging Interceptor (only in debug mode)
