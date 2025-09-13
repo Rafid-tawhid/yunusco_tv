@@ -73,22 +73,15 @@ class ReportService {
 
 
   Future<dynamic> getAllDhu(String date) async {
-    final response = await _dio.get('/api/QMS/GetDHU', queryParameters: {
-      'qmsDate': date,
-    });
+    try {
+      final response = await _dio.get('/api/QMS/GetDHU', queryParameters: {
+        'qmsDate': '2025-08-16', // Use the provided date parameter
+      });
 
-    final data = response.data;
-    debugPrint('HELLO WORLD ${data}');
-
-    var sectionWiseData=[];
-
-    for(var i in data['Data']['SectionWiseDHU']){
-      sectionWiseData.add(i);
+      return response.data;
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch DHU data: ${e.message}');
     }
-
-    debugPrint('sectionWiseData ${sectionWiseData.length}');
-
-    return sectionWiseData;
   }
 
 

@@ -6,6 +6,7 @@ import 'package:yunusco_ppt_tv/services/helper_class.dart';
 import '../providers/report_provider.dart';
 import '../services/constants.dart';
 import '../widgets/attendance_slide.dart';
+import '../widgets/dhu_widget.dart';
 import '../widgets/input_issues_slide.dart';
 import '../widgets/production_summary.dart';
 
@@ -252,7 +253,7 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
                   Column(
                     children: [
                       _buildMMRSlide(ref),
-                      _buildSectionWiseDHU(ref)
+                      DHUDashboard()
                     ],
                   ),
                 ],
@@ -373,32 +374,9 @@ class _SlideDashboardScreenState extends ConsumerState<SlideDashboardScreen>
   }
 
 
-  Widget _buildSectionWiseDHU(WidgetRef ref) {
-    final mmrAsync = ref.watch(dhuProvider);
 
-    return mmrAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, stack) => Center(child: Text('Error: $error')),
-      data: (mmr) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Section wise DHU',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: _getMMRColor(mmr/100),
-                ),
-              ),
-              Text('sectionWiseData $mmrAsync')
-            ],
-          ),
-        );
-      },
-    );
-  }
+
+
 
 
 

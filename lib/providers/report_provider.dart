@@ -2,6 +2,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yunusco_ppt_tv/models/shipment_info_model.dart';
 
+import '../models/dhu_model.dart';
 import '../models/employee_attendance_model.dart';
 import '../models/factory_report_model.dart';
 import '../models/input_issue_model.dart';
@@ -30,11 +31,20 @@ final mmrProvider = FutureProvider<num>((ref) {
 
 
 // 1. DHU Report
-final dhuProvider = FutureProvider<dynamic>((ref) {
-  final repo = ref.watch(reportRepositoryProvider);
+// final dhuProvider = FutureProvider<dynamic>((ref) {
+//   final repo = ref.watch(reportRepositoryProvider);
+//   final date = ref.watch(selectedDateProvider);
+//   return repo.getAllDhu(date);
+// });
+
+final dhuProvider = FutureProvider.autoDispose.family<DHUResponse, String>((ref, date) async {
+    final repo = ref.watch(reportRepositoryProvider);
   final date = ref.watch(selectedDateProvider);
-  return repo.getAllDhu(date);
+  final data=await repo.getAllDhu(date);
+  return DHUResponse.fromJson(data);
 });
+
+
 
 // 2. Factory Reports List
 final filteredReportListProvider = FutureProvider<List<FactoryReportModel>>((ref) {
